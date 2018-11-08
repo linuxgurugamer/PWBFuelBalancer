@@ -1,7 +1,15 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C# Express 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PWBFuelBalancer", "PWBFuelBalancer.csproj", "{E8BF24DD-391E-4ABA-BFB5-B7610F57CD55}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2005
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PWBFuelBalancer", "PWBFuelBalancer\PWBFuelBalancer.csproj", "{E8BF24DD-391E-4ABA-BFB5-B7610F57CD55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{23A0DD97-C230-4509-92E4-7364760A0066}"
+	ProjectSection(SolutionItems) = preProject
+		deploy.bat = deploy.bat
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E6A2B930-CA5F-4213-9CC6-2936FA01F29A}
 	EndGlobalSection
 EndGlobal
