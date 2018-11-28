@@ -119,8 +119,8 @@ namespace PWBFuelBalancer
             GuiUtils.ComboBox.DrawGui();
 
             // If the mouse is over our window, then lock the rest of the UI
-            if (HighLogic.LoadedSceneIsEditor) PreventEditorClickthrough();
-            if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneHasPlanetarium) PreventInFlightClickthrough();
+            //if (HighLogic.LoadedSceneIsEditor) PreventEditorClickthrough();
+            //if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneHasPlanetarium) PreventInFlightClickthrough();
         }
 
         private bool MouseIsOverWindow()
@@ -195,27 +195,39 @@ namespace PWBFuelBalancer
                         }
                     }
                     GUILayout.BeginHorizontal();
-
+               
                     GUILayout.BeginVertical();
                     if (GUILayout.Button("up"))
                     {
-                        selBal.VecFuelBalancerCoMTarget.y += 0.05f;
+                        if (selBal.vessel.vesselType == VesselType.Plane)
+                            selBal.VecFuelBalancerCoMTarget.y += 0.05f;
+                        else
+                            selBal.VecFuelBalancerCoMTarget.y -= 0.05f;
                     }
                     if (GUILayout.Button("down"))
                     {
-                        selBal.VecFuelBalancerCoMTarget.y -= 0.05f;
+                        if (selBal.vessel.vesselType == VesselType.Plane)
+                            selBal.VecFuelBalancerCoMTarget.y -= 0.05f;
+                        else
+                            selBal.VecFuelBalancerCoMTarget.y += 0.05f;
                     }
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical();
 
                     if (GUILayout.Button("forward"))
                     {
-                        selBal.VecFuelBalancerCoMTarget.x += 0.05f;
+                        if (selBal.vessel.vesselType == VesselType.Plane)
+                            selBal.VecFuelBalancerCoMTarget.z += 0.05f;
+                        else
+                            selBal.VecFuelBalancerCoMTarget.x += 0.05f;
                     }
 
                     if (GUILayout.Button("back"))
                     {
-                        selBal.VecFuelBalancerCoMTarget.x -= 0.05f;
+                        if (selBal.vessel.vesselType == VesselType.Plane)
+                            selBal.VecFuelBalancerCoMTarget.z -= 0.05f;
+                        else
+                            selBal.VecFuelBalancerCoMTarget.x -= 0.05f;
                     }
 
                     GUILayout.EndVertical();
@@ -224,11 +236,17 @@ namespace PWBFuelBalancer
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button("left"))
                     {
-                        selBal.VecFuelBalancerCoMTarget.z += 0.05f;
+                        if (selBal.vessel.vesselType == VesselType.Plane)
+                            selBal.VecFuelBalancerCoMTarget.x -= 0.05f;
+                        else
+                            selBal.VecFuelBalancerCoMTarget.z += 0.05f;
                     }
                     if (GUILayout.Button("right"))
                     {
-                        selBal.VecFuelBalancerCoMTarget.z -= 0.05f;
+                        if (selBal.vessel.vesselType == VesselType.Plane)
+                            selBal.VecFuelBalancerCoMTarget.x += 0.05f;
+                        else
+                            selBal.VecFuelBalancerCoMTarget.z -= 0.05f;
                     }
                     GUILayout.EndHorizontal();
 

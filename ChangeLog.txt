@@ -1,0 +1,23 @@
+0.1.x.x
+	Adoption by LinuxGuruGamer
+	Removed old class: PwbkspFuelBalancer, was in for compatibility with old games
+	Commented out code which prevented click-through
+	Fixed the adjustment of the target to depend on the vessel type, either Plane or anything else
+	Added new KSPEvent to set the COM, also created method SetCOM which is called from other places
+	Added screen message telling player to turn on the COM if it isn't when trying to set a target
+	Added code to show the markerCam only when in flight
+	Fixed case of RotationInEditor (r had been lowercase)
+
+
+0.1.3.0
+	Support of mod changed hands to Papa_Joe from codePoet. (Thanks codePoet!)
+	Updated to be compatible with KSP 1.1.3
+	Restrucutred solution to allow for automated build and deploy
+	Refactored code to improve organization, performance, reduce garbage collection, and use explicit typing.
+	Got rid of the "horrible" fixedUpdate editorpartcount methodology. implemented OnEditorShipModified for event driven handling of vessel part count changes. (codepoet knows what I mean :) )
+	Added close button to the upper right of the Fuel Balancer window.
+	Added scene specific window positioning. Editor now starts just to the right of the parts list. Flight now starts a safe margin to the right of the staging tree.
+
+0.0.6
+	Updated for KSP 0.23.5
+	changed to be operating from launch rather than when its stage is staged.

@@ -91,6 +91,13 @@ namespace PWBFuelBalancer
             Status = "Maintaining";
         }
 
+        [KSPEvent(guiActiveEditor = true)]
+        void SetCoM()
+        {
+            if (SetCoMTarget())
+                ScreenMessages.PostScreenMessage("CoM Target Set", 5);
+        }
+
         [KSPEvent(guiActive = true, guiName = "Balance Fuel", active = true)]
         public void BalanceFuel()
         {
@@ -252,7 +259,19 @@ namespace PWBFuelBalancer
         public override void OnSave(ConfigNode node)
         {
             //print("PWBKSPFueBalancer::OnSave");
+#if false
+            ConfigNode n = new ConfigNode();
+            n.AddValue("VecFuelBalancerCoMTargetx", VecFuelBalancerCoMTarget.x);
+            n.AddValue("VecFuelBalancerCoMTargety", VecFuelBalancerCoMTarget.y);
+            n.AddValue("VecFuelBalancerCoMTargetz", VecFuelBalancerCoMTarget.z);
 
+            n.AddValue("RotationInEditorx", RotationInEditor.x);
+            n.AddValue("RotationInEditory", RotationInEditor.y);
+            n.AddValue("RotationInEditorz", RotationInEditor.z);
+            n.AddValue("RotationInEditorw", RotationInEditor.w);
+
+            node.AddNode("PWBFuelBalancer", n);
+#endif
         }
 
         /// <summary>
@@ -267,8 +286,28 @@ namespace PWBFuelBalancer
             // For now just dump out what the Config nodes are...
             DumpConfigNode(node);
 
+#if false
+            if (node.nodes.Contains("PWBFuelBalancer"))
+            {
+                float x = 0, y = 0, z = 0, w = 0;
+                ConfigNode n = node.GetNode("PWBFuelBalancer");
+               
+                n.TryGetValue("VecFuelBalancerCoMTargetx", ref x);
+                n.TryGetValue("VecFuelBalancerCoMTargety", ref y);
+                n.TryGetValue("VecFuelBalancerCoMTargetz", ref z);
+                VecFuelBalancerCoMTarget = new Vector3(x,y,z);
+
+                n.TryGetValue("RotationInEditorx", ref x);
+                n.TryGetValue("RotationInEditory", ref y);
+                n.TryGetValue("RotationInEditorz", ref z);
+                n.TryGetValue("RotationInEditorw", ref w);
+
+                RotationInEditor = new Quaternion(x,y,z,w);
+            }
+#endif
+#if false
             // Is the rotation config value set?
-            if (node.values.Contains("rotationInEditor")) return;
+            if (node.values.Contains("RotationInEditor")) return;
 
             // rotationInEditor does not exist - must be a v0.0.3 craft. We need to upgrade it.
             //print("rotationInEditor was not set.");
@@ -290,6 +329,7 @@ namespace PWBFuelBalancer
                 //print("rotationInEditor was not set. In the editor it has been set to: " + this.rotationInEditor);
 
             }
+#endif
         }
 
         private void DumpConfigNode(ConfigNode node)
@@ -306,7 +346,9 @@ namespace PWBFuelBalancer
             {
                 if (DateTime.Now <= _lastKeyInputTime.AddMilliseconds(100)) return;
                 _lastKeyInputTime = DateTime.Now;
-                SetCoMTarget();
+                SetCoM();
+                //if (SetCoMTarget())
+                //    ScreenMessages.PostScreenMessage("CoM Target Set", 5);
             }
             else if (part.isAttached && Input.GetKey(DisplayMarker))
             {
@@ -342,7 +384,7 @@ namespace PWBFuelBalancer
             }
         }
 
-        private void SetCoMTarget()
+        private bool SetCoMTarget()
         {
             // We are depending on the CoM indicator for the location of the CoM which is a bit rubbish :( There ust be a better way of doing this!
             EditorMarker_CoM coM = (EditorMarker_CoM)FindObjectOfType(typeof(EditorMarker_CoM));
@@ -350,6 +392,8 @@ namespace PWBFuelBalancer
             {
                 // There is no CoM indicator. Spawn an instruction screen or something
                 _osd.Error("To set the target CoM, first turn on the CoM Marker");
+                ScreenMessages.PostScreenMessage("To set the target CoM, first turn on the CoM Marker", 5);
+                return false;
             }
             else
             {
@@ -382,6 +426,7 @@ namespace PWBFuelBalancer
                 }
             }
             //print("Setting the targetCoM location for fuel balancing.");
+            return true;
         }
 
 
@@ -393,7 +438,7 @@ namespace PWBFuelBalancer
             // First try to find the camera that will be used to display the marker - it needs a special camera to make it "float"
             Camera markerCam = InFlightMarkerCam.GetMarkerCam();
 
-            // Did we find the camera? If we did then set up the marker object, and idsplkay it via tha camera we found
+            // Did we find the camera? If we did then set up the marker object, and display it via tha camera we found
             if (null == markerCam) return;
             // Try to create a game object using our marker mesh
             SavedCoMMarker = Instantiate(GameDatabase.Instance.GetModel("PWBFuelBalancer/Assets/PWBTargetComMarker"));
@@ -408,7 +453,8 @@ namespace PWBFuelBalancer
 
             // Start the marker visible if it has been set to be visible, or hidden if it is set to be hidden
             SavedCoMMarker.SetActive(MarkerVisible);
-            markerCam.enabled = MarkerVisible;
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT)
+                markerCam.enabled = MarkerVisible;
 
             int layer = (int)(Math.Log(markerCam.cullingMask) / Math.Log(2));
             // print("MarkerCam has cullingMask: " + markerCam.cullingMask + " setting marker to be in layer: " + layer);
