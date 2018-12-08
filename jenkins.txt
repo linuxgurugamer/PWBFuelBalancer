@@ -27,13 +27,13 @@
 # 0:1.3
 
 # 1:GAMEDIR, VERSIONFILE [, GITHUBREPO ]
-1:PWBFuelBalancer, PWBFuelBalancer.version
+1:PWBFuelBalancerRestored, PWBFuelBalancer.version
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:PWBFuelBalancer,PWBFuelBalancer/PWBFuelBalancer.csproj,PWBFuelBalancer.version,GameData/PWBFuelBalancer/Plugins
+2:PWBFuelBalancerRestored,PWBFuelBalancerRestored/PWBFuelBalancer.csproj,PWBFuelBalancerRestored.version,GameData/PWBFuelBalancerRestored/Plugins
 
 # 3:SOURCEFILE, DESTDIR
-3:PWBFuelBalancer.version,GameData/PWBFuelBalancer
+3:PWBFuelBalancerRestored.version,GameData/PWBFuelBalancerRestored
 #3:LICENSE.md,GameData/KerbalHotSeat
 #3:README.md,GameData/KerbalHotSeat
 

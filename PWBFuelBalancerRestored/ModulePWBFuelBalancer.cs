@@ -267,68 +267,6 @@ namespace PWBFuelBalancer
             return (distanceFromCoMToTarget);
         }
 
-        /// <summary>
-        /// Called when PartModule is asked to save its values.
-        /// Can save additional data here.
-        /// </summary>
-        /// <param name='node'>The node to save in to</param>
-        public override void OnSave(ConfigNode node)
-        {
-            //print("PWBKSPFueBalancer::OnSave");
-#if false
-            ConfigNode n = new ConfigNode();
-            n.AddValue("VecFuelBalancerCoMTargetx", VecFuelBalancerCoMTarget.x);
-            n.AddValue("VecFuelBalancerCoMTargety", VecFuelBalancerCoMTarget.y);
-            n.AddValue("VecFuelBalancerCoMTargetz", VecFuelBalancerCoMTarget.z);
-
-            n.AddValue("RotationInEditorx", RotationInEditor.x);
-            n.AddValue("RotationInEditory", RotationInEditor.y);
-            n.AddValue("RotationInEditorz", RotationInEditor.z);
-            n.AddValue("RotationInEditorw", RotationInEditor.w);
-
-            node.AddNode("PWBFuelBalancer", n);
-#endif
-        }
-
-        /// <summary>
-        /// Called when PartModule is asked to load its values.
-        /// Can load additional data here.
-        /// </summary>
-        /// <param name='node'>The node to load from</param>
-        public override void OnLoad(ConfigNode node)
-        {
-            //print("PWBKSPFueBalancer::OnLoad");
-
-            // For now just dump out what the Config nodes are...
-            DumpConfigNode(node);
-
-
-#if false
-            // Is the rotation config value set?
-            if (node.values.Contains("RotationInEditor")) return;
-
-            // rotationInEditor does not exist - must be a v0.0.3 craft. We need to upgrade it.
-            //print("rotationInEditor was not set.");
-            // Only bother to upgrade if we are in flight. If we are in the VAB/SPH then the user can fix the CoM themselves (or just lauch)
-            if (HighLogic.LoadedSceneIsFlight)
-            {
-                // TODO remove diagnostic
-                {
-                    // I am suspicious that on loading the vessel rotation is not properly set. Let us check
-                    //print("In onload this.vessel.transform.rotation" + this.vessel.transform.rotation);
-                }
-                RotationInEditor = part.transform.rotation * Quaternion.Inverse(vessel.transform.rotation);
-                //print("rotationInEditor was not set. In flight it has been set to: " + this.rotationInEditor);
-
-            }
-            else if (HighLogic.LoadedSceneIsEditor)
-            {
-                RotationInEditor = part.transform.rotation * Quaternion.Inverse(EditorLogic.VesselRotation);
-                //print("rotationInEditor was not set. In the editor it has been set to: " + this.rotationInEditor);
-
-            }
-#endif
-        }
 
         private void DumpConfigNode(ConfigNode node)
         {
@@ -468,7 +406,7 @@ namespace PWBFuelBalancer
             // Did we find the camera? If we did then set up the marker object, and display it via tha camera we found
             if (null == markerCam) return;
             // Try to create a game object using our marker mesh
-            SavedCoMMarker = Instantiate(GameDatabase.Instance.GetModel("PWBFuelBalancer/Assets/PWBTargetComMarker"));
+            SavedCoMMarker = Instantiate(GameDatabase.Instance.GetModel("PWBFuelBalancerRestored/Assets/PWBTargetComMarker"));
 
             // Make it a bit smaller - we need to fix the model for this
             SavedCoMMarker.transform.localScale = Vector3.one * 0.5f;
@@ -491,7 +429,7 @@ namespace PWBFuelBalancer
             // Do it all again to create a marker for the actual centre of mass (rather than the target) TODO find a way of refactoring this
             if (!HighLogic.LoadedSceneIsFlight) return;
             // Try to create a game object using our marker mesh
-            ActualCoMMarker = Instantiate(GameDatabase.Instance.GetModel("PWBFuelBalancer/Assets/PWBComMarker"));
+            ActualCoMMarker = Instantiate(GameDatabase.Instance.GetModel("PWBFuelBalancerRestored/Assets/PWBComMarker"));
 
             // Make it a bit smaller - we need to fix the model for this
             ActualCoMMarker.transform.localScale = Vector3.one * 0.45f;

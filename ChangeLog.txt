@@ -13,6 +13,8 @@
 	Added code to properly find fuel balancers when ship loaded in editor
 	Moved adding methods to GameEvents to the Awake instead of the Start
 	Added logging class
+	Replaced toolbar code with the ToolbarController
+	Deleted commented out code
 
 
 0.1.3.0

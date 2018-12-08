@@ -85,48 +85,26 @@ namespace PWBFuelBalancer
         }
 
         internal const string MODID = "PWBFuelBalancer_NS";
-        internal const string MODNAME = "PWBFuelBalancer";
+        internal const string MODNAME = "PWB Fuel Balancer";
 
         private void OnGuiAppLauncherReady()
         {
-#if false
-            _stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(OnAppLaunchToggle,
-              OnAppLaunchToggle,
-              DummyVoid,
-              DummyVoid,
-              DummyVoid,
-              DummyVoid,
-              ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.FLIGHT,
-              GameDatabase.Instance.GetTexture("PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off", false));
-#endif
             toolbarControl = gameObject.AddComponent<ToolbarControl>();
             toolbarControl.AddToAllToolbars(OnAppLaunchToggle, OnAppLaunchToggle,
                 ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.FLIGHT,
                 MODID,
                 "slingShotterButton",
-                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_on_38",
-                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off_38",
-                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_on_24",
-                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off_24",
+                "PWBFuelBalancerRestored/PluginData/Assets/pwbfuelbalancer_icon_on_38",
+                "PWBFuelBalancerRestored/PluginData/Assets/pwbfuelbalancer_icon_off_38",
+                "PWBFuelBalancerRestored/PluginData/Assets/pwbfuelbalancer_icon_on_24",
+                "PWBFuelBalancerRestored/PluginData/Assets/pwbfuelbalancer_icon_off_24",
                 MODNAME
             );
 
         }
-#if false
-        private void OnGuiAppLauncherDestroyed()
-        {
-            if (_stockToolbarButton == null) return;
-            ApplicationLauncher.Instance.RemoveModApplication(_stockToolbarButton);
-            _stockToolbarButton = null;
-        }
-#endif
+
         private void OnAppLaunchToggle()
         {
-#if false
-            _stockToolbarButton.SetTexture(!_visable
-              ? GameDatabase.Instance.GetTexture("PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_on", false)
-              : GameDatabase.Instance.GetTexture("PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off", false));
-#endif
 
             _visable = !_visable;
         }

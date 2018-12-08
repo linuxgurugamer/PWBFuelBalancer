@@ -30,7 +30,7 @@
 	//
 	// Update the following with the complete path to the .version file
 	//
-	string versionfile =  @"D:\Users\jbb\github\PWBFuelBalancer\PWBFuelBalancer.version";
+	string versionfile =  @"D:\Users\jbb\github\PWBFuelBalancerRestored\PWBFuelBalancerRestored.version";
 
 	if (!File.Exists(versionfile))
 	{

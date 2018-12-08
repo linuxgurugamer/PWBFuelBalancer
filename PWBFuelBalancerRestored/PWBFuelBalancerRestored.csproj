@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PWBFuelBalancer</RootNamespace>
-    <AssemblyName>PWBFuelBalancer</AssemblyName>
+    <AssemblyName>PWBFuelBalancerRestored</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -96,15 +96,13 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-start /D D:\Users\jbb\github\PWBFuelBalancer /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
-
+start /D D:\Users\jbb\github\PWBFuelBalancerRestored /WAIT deploy.bat  $(TargetDir) $(TargetFileName)
 
 
 if $(ConfigurationName) == Release (
 
 
-	start /D D:\Users\jbb\github\PWBFuelBalancer /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
-
+ 	start /D D:\Users\jbb\github\PWBFuelBalancerRestored /WAIT buildRelease.bat $(TargetDir) $(TargetFileName)
 
 )</PostBuildEvent>
   </PropertyGroup>
