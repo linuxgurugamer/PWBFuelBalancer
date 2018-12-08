@@ -30,7 +30,7 @@
 1:PWBFuelBalancerRestored, PWBFuelBalancerRestored.version
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:PWBFuelBalancerRestored,PWBFuelBalancerRestored/PWBFuelBalancer.csproj,PWBFuelBalancerRestored.version,GameData/PWBFuelBalancerRestored/Plugins
+2:PWBFuelBalancerRestored,PWBFuelBalancerRestored/PWBFuelBalancerRestored.csproj,PWBFuelBalancerRestored.version,GameData/PWBFuelBalancerRestored/Plugins
 
 # 3:SOURCEFILE, DESTDIR
 3:PWBFuelBalancerRestored.version,GameData/PWBFuelBalancerRestored
