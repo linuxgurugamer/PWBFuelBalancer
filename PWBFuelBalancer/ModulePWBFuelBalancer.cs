@@ -156,7 +156,7 @@ namespace PWBFuelBalancer
         /// </summary>
         public override void OnAwake()
         {
-            //print("PWBKSPFueBalancer::OnAwake");
+            Log.Info("PWBKSPFueBalancer::OnAwake");
             _tanks = null;
             MarkerVisible = false;
         }
@@ -167,6 +167,7 @@ namespace PWBFuelBalancer
         /// </summary>
         public override void OnStart(StartState state)
         {
+            Log.Info("PWBKSPFueBalancer::OnStart");
             // Set the status to be deactivated
             Status = "Deactivated";
             _osd = new Osd();
@@ -178,6 +179,21 @@ namespace PWBFuelBalancer
             CreateSavedComMarker();
 
             _started = true;
+            
+            GameEvents.onEditorPartPlaced.Add(OnEditorPartPlaced);
+            
+        }
+
+        public  void Destroy()
+        {
+            Log.Info("ModulePWBFuelBalancer.Destroy");
+            GameEvents.onEditorPartPlaced.Remove(OnEditorPartPlaced);
+        }
+        void OnEditorPartPlaced(Part p)
+        {
+            if (p == this.part)
+                // Set the CoM to the current CoM
+                SetCoMTarget();
         }
 
         /// <summary>
@@ -286,25 +302,7 @@ namespace PWBFuelBalancer
             // For now just dump out what the Config nodes are...
             DumpConfigNode(node);
 
-#if false
-            if (node.nodes.Contains("PWBFuelBalancer"))
-            {
-                float x = 0, y = 0, z = 0, w = 0;
-                ConfigNode n = node.GetNode("PWBFuelBalancer");
-               
-                n.TryGetValue("VecFuelBalancerCoMTargetx", ref x);
-                n.TryGetValue("VecFuelBalancerCoMTargety", ref y);
-                n.TryGetValue("VecFuelBalancerCoMTargetz", ref z);
-                VecFuelBalancerCoMTarget = new Vector3(x,y,z);
 
-                n.TryGetValue("RotationInEditorx", ref x);
-                n.TryGetValue("RotationInEditory", ref y);
-                n.TryGetValue("RotationInEditorz", ref z);
-                n.TryGetValue("RotationInEditorw", ref w);
-
-                RotationInEditor = new Quaternion(x,y,z,w);
-            }
-#endif
 #if false
             // Is the rotation config value set?
             if (node.values.Contains("RotationInEditor")) return;
@@ -370,37 +368,53 @@ namespace PWBFuelBalancer
 
             if (InFlightMarkerCam.MarkerCam != null) InFlightMarkerCam.MarkerCam.enabled = !MapView.MapIsEnabled && MarkerVisible;
 
-            // TODO remove - Diagnostics
+
             {
                 if (HighLogic.LoadedSceneIsFlight)
                 {
-                    //print("vessel.transform.rotation : " + this.vessel.transform.rotation);
-                    //print("vessel.ReferenceTransform.rotation : " + this.vessel.ReferenceTransform.rotation);
-                    //print("vessel.transform.rotation .eulerAngles: " + this.vessel.transform.rotation.eulerAngles);
-                    //print("vessel.upaxis : " + this.vessel.upAxis);
+                    Log.Info("vessel.transform.rotation : " + this.vessel.transform.rotation);
+                    Log.Info("vessel.ReferenceTransform.rotation : " + this.vessel.ReferenceTransform.rotation);
+                    Log.Info("vessel.transform.rotation .eulerAngles: " + this.vessel.transform.rotation.eulerAngles);
+                    Log.Info("vessel.upaxis : " + this.vessel.upAxis);
 
-                    //print("upaxis: " + (Vector3)(Quaternion.Inverse(this.vessel.transform.rotation) *this.vessel.upAxis ));
+                    Log.Info("upaxis: " + (Vector3)(Quaternion.Inverse(this.vessel.transform.rotation) *this.vessel.upAxis ));
                 }
             }
         }
 
         private bool SetCoMTarget()
         {
+            bool initalOff = false;
+#if false
             // We are depending on the CoM indicator for the location of the CoM which is a bit rubbish :( There ust be a better way of doing this!
             EditorMarker_CoM coM = (EditorMarker_CoM)FindObjectOfType(typeof(EditorMarker_CoM));
             if (coM == null)
             {
-                // There is no CoM indicator. Spawn an instruction screen or something
-                _osd.Error("To set the target CoM, first turn on the CoM Marker");
-                ScreenMessages.PostScreenMessage("To set the target CoM, first turn on the CoM Marker", 5);
-                return false;
+                EditorVesselOverlays evo = (EditorVesselOverlays)FindObjectOfType(typeof(EditorVesselOverlays));
+                if (evo != null)
+                {
+                    evo.CoMmarker.gameObject.SetActive(true);
+                    coM = evo.CoMmarker;
+                    initalOff = true;
+                }
+                if (coM == null)
+                {
+                    // There is no CoM indicator. Spawn an instruction screen or something
+                    _osd.Error("To set the target CoM, first turn on the CoM Marker");
+                    ScreenMessages.PostScreenMessage("To set the target CoM, first turn on the CoM Marker", 5);
+                    return false;
+                }
             }
-            else
+            //else
+#endif
             {
                 // get the location of the centre of mass
                 //print("Com position: " + CoM.transform.position);
-                Vector3 vecCom = coM.transform.position;
-                //print("vecCom: " + vecCom);
+                //Vector3 vecCom = coM.transform.position;
+                
+                //Log.Info("vecCom: " + vecCom);
+                //Log.Info("coM.findCenterOfMass: " + EditorMarker_CoM.findCenterOfMass(EditorLogic.RootPart));
+                Vector3 vecCom = EditorMarker_CoM.findCenterOfMass(EditorLogic.RootPart);
 
                 RotationInEditor = part.transform.rotation;
                 //print("Part position: " + part.transform.position);
@@ -426,18 +440,31 @@ namespace PWBFuelBalancer
                 }
             }
             //print("Setting the targetCoM location for fuel balancing.");
+#if false
+            if (initalOff)
+            {
+                coM.gameObject.SetActive(false);
+                ScreenMessages.PostScreenMessage("Target CoM set to current (hidden) CoM", 5);
+            }
+#endif
             return true;
         }
 
 
         private void CreateSavedComMarker()
         {
+            Log.Info("CreateSavedComMarker");
+            if (SavedCoMMarker == null)
+                Log.Info("SavedCoMMarker is null");
+
 
             // Do not try to create the marker if it already exisits
             if (null != SavedCoMMarker) return;
             // First try to find the camera that will be used to display the marker - it needs a special camera to make it "float"
             Camera markerCam = InFlightMarkerCam.GetMarkerCam();
 
+            if (markerCam == null)
+                Log.Info("markerCam is null");
             // Did we find the camera? If we did then set up the marker object, and display it via tha camera we found
             if (null == markerCam) return;
             // Try to create a game object using our marker mesh

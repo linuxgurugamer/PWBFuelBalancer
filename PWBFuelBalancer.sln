@@ -7,8 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PWBFuelBalancer", "PWBFuelB
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{23A0DD97-C230-4509-92E4-7364760A0066}"
 	ProjectSection(SolutionItems) = preProject
+		buildRelease.bat = buildRelease.bat
 		ChangeLog.txt = ChangeLog.txt
 		deploy.bat = deploy.bat
+		jenkins.txt = jenkins.txt
+		License.txt = License.txt
+		PWBFuelBalancer.version = PWBFuelBalancer.version
 		README.md = README.md
 	EndProjectSection
 EndProject

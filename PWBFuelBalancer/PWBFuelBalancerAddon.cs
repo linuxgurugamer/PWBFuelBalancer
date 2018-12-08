@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using KSP.UI.Screens;
 using UnityEngine;
+using ToolbarControl_NS;
 
 namespace PWBFuelBalancer
 {
@@ -17,7 +18,8 @@ namespace PWBFuelBalancer
         private static GUIStyle _windowStyle;
         private bool _weLockedInputs;
 
-        private ApplicationLauncherButton _stockToolbarButton; // Stock Toolbar Button
+        //private ApplicationLauncherButton _stockToolbarButton; // Stock Toolbar Button
+        ToolbarControl toolbarControl;
 
         private bool _visable;
 
@@ -41,29 +43,35 @@ namespace PWBFuelBalancer
 
         public void Awake()
         {
-            //Debug.Log("PWBFuelBalancerAddon:Awake");
+            Log.Info("PWBFuelBalancerAddon:Awake");
 
             // create the list of balancers
             _listFuelBalancers = new List<ModulePWBFuelBalancer>();
 
             // Set up the stock toolbar
-            GameEvents.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
-            GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
+            //.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
+            //GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
+            OnGuiAppLauncherReady();
 
-        }
-
-        public void Start()
-        {
-            //Debug.Log("PWBFuelBalancerAddon:Start");
-            _currentWindowPosition = HighLogic.LoadedSceneIsEditor ? _windowPositionEditor : _windowPositionFlight;
-            _windowStyle = new GUIStyle(HighLogic.Skin.window);
-
-            if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight) return; GameEvents.onVesselWasModified.Add(OnVesselWasModified);
+            GameEvents.onVesselWasModified.Add(OnVesselWasModified);
             GameEvents.onVesselChange.Add(OnVesselChange);
             GameEvents.onVesselLoaded.Add(OnVesselLoaded);
             GameEvents.onEditorShipModified.Add(OnEditorShipModified);
             GameEvents.onFlightReady.Add(OnFlightReady);
             GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
+            GameEvents.onEditorLoad.Add(this.OnEditorLoad);
+        }
+
+        public void Start()
+        {
+            Log.Info("PWBFuelBalancerAddon:Start");
+            _currentWindowPosition = HighLogic.LoadedSceneIsEditor ? _windowPositionEditor : _windowPositionFlight;
+            _windowStyle = new GUIStyle(HighLogic.Skin.window);
+
+            //if (!HighLogic.LoadedSceneIsEditor && !HighLogic.LoadedSceneIsFlight) return;
+
+
+
         }
 
 
@@ -76,8 +84,12 @@ namespace PWBFuelBalancer
             _currentWindowPosition = scene == GameScenes.EDITOR ? _windowPositionEditor : _windowPositionFlight;
         }
 
+        internal const string MODID = "PWBFuelBalancer_NS";
+        internal const string MODNAME = "PWBFuelBalancer";
+
         private void OnGuiAppLauncherReady()
         {
+#if false
             _stockToolbarButton = ApplicationLauncher.Instance.AddModApplication(OnAppLaunchToggle,
               OnAppLaunchToggle,
               DummyVoid,
@@ -85,21 +97,36 @@ namespace PWBFuelBalancer
               DummyVoid,
               DummyVoid,
               ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.FLIGHT,
-              GameDatabase.Instance.GetTexture("PWBFuelBalancer/Assets/pwbfuelbalancer_icon_off", false));
-        }
+              GameDatabase.Instance.GetTexture("PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off", false));
+#endif
+            toolbarControl = gameObject.AddComponent<ToolbarControl>();
+            toolbarControl.AddToAllToolbars(OnAppLaunchToggle, OnAppLaunchToggle,
+                ApplicationLauncher.AppScenes.VAB | ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.FLIGHT,
+                MODID,
+                "slingShotterButton",
+                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_on_38",
+                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off_38",
+                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_on_24",
+                "PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off_24",
+                MODNAME
+            );
 
+        }
+#if false
         private void OnGuiAppLauncherDestroyed()
         {
             if (_stockToolbarButton == null) return;
             ApplicationLauncher.Instance.RemoveModApplication(_stockToolbarButton);
             _stockToolbarButton = null;
         }
-
+#endif
         private void OnAppLaunchToggle()
         {
+#if false
             _stockToolbarButton.SetTexture(!_visable
-              ? GameDatabase.Instance.GetTexture("PWBFuelBalancer/Assets/pwbfuelbalancer_icon_on", false)
-              : GameDatabase.Instance.GetTexture("PWBFuelBalancer/Assets/pwbfuelbalancer_icon_off", false));
+              ? GameDatabase.Instance.GetTexture("PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_on", false)
+              : GameDatabase.Instance.GetTexture("PWBFuelBalancer/PluginData/Assets/pwbfuelbalancer_icon_off", false));
+#endif
 
             _visable = !_visable;
         }
@@ -163,7 +190,8 @@ namespace PWBFuelBalancer
                 Rect rect = new Rect(_currentWindowPosition.width - 20, 4, 16, 16);
                 if (GUI.Button(rect, ""))
                 {
-                    OnAppLaunchToggle();
+                    toolbarControl.SetFalse(true);
+                    //OnAppLaunchToggle();
                 }
                 GUILayout.BeginVertical();
                 List<string> strings = new List<string>();
@@ -195,28 +223,29 @@ namespace PWBFuelBalancer
                         }
                     }
                     GUILayout.BeginHorizontal();
-               
+
                     GUILayout.BeginVertical();
                     if (GUILayout.Button("up"))
                     {
-                        if (selBal.vessel.vesselType == VesselType.Plane)
-                            selBal.VecFuelBalancerCoMTarget.y += 0.05f;
-                        else
-                            selBal.VecFuelBalancerCoMTarget.y -= 0.05f;
+                        //if (selBal.vessel.vesselType == VesselType.Plane)
+                        selBal.VecFuelBalancerCoMTarget.y += 0.05f;
+                        //else
+                        //    selBal.VecFuelBalancerCoMTarget.y -= 0.05f;
                     }
                     if (GUILayout.Button("down"))
                     {
-                        if (selBal.vessel.vesselType == VesselType.Plane)
-                            selBal.VecFuelBalancerCoMTarget.y -= 0.05f;
-                        else
-                            selBal.VecFuelBalancerCoMTarget.y += 0.05f;
+                        //if (selBal.vessel.vesselType == VesselType.Plane)
+                        selBal.VecFuelBalancerCoMTarget.y -= 0.05f;
+                        //else
+                        //    selBal.VecFuelBalancerCoMTarget.y += 0.05f;
                     }
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical();
 
                     if (GUILayout.Button("forward"))
                     {
-                        if (selBal.vessel.vesselType == VesselType.Plane)
+                        if ((HighLogic.LoadedSceneIsEditor && EditorDriver.editorFacility == EditorFacility.SPH) ||
+                                (HighLogic.LoadedSceneIsFlight && selBal.vessel.vesselType == VesselType.Plane))
                             selBal.VecFuelBalancerCoMTarget.z += 0.05f;
                         else
                             selBal.VecFuelBalancerCoMTarget.x += 0.05f;
@@ -224,7 +253,8 @@ namespace PWBFuelBalancer
 
                     if (GUILayout.Button("back"))
                     {
-                        if (selBal.vessel.vesselType == VesselType.Plane)
+                        if ((HighLogic.LoadedSceneIsEditor && EditorDriver.editorFacility == EditorFacility.SPH) ||
+                            (HighLogic.LoadedSceneIsFlight && selBal.vessel.vesselType == VesselType.Plane))
                             selBal.VecFuelBalancerCoMTarget.z -= 0.05f;
                         else
                             selBal.VecFuelBalancerCoMTarget.x -= 0.05f;
@@ -236,14 +266,16 @@ namespace PWBFuelBalancer
                     GUILayout.BeginHorizontal();
                     if (GUILayout.Button("left"))
                     {
-                        if (selBal.vessel.vesselType == VesselType.Plane)
+                        if ((HighLogic.LoadedSceneIsEditor && EditorDriver.editorFacility == EditorFacility.SPH) ||
+                            (HighLogic.LoadedSceneIsFlight && selBal.vessel.vesselType == VesselType.Plane))
                             selBal.VecFuelBalancerCoMTarget.x -= 0.05f;
                         else
                             selBal.VecFuelBalancerCoMTarget.z += 0.05f;
                     }
                     if (GUILayout.Button("right"))
                     {
-                        if (selBal.vessel.vesselType == VesselType.Plane)
+                        if((HighLogic.LoadedSceneIsEditor && EditorDriver.editorFacility == EditorFacility.SPH) ||
+                            (HighLogic.LoadedSceneIsFlight && selBal.vessel.vesselType == VesselType.Plane))
                             selBal.VecFuelBalancerCoMTarget.x += 0.05f;
                         else
                             selBal.VecFuelBalancerCoMTarget.z -= 0.05f;
@@ -293,6 +325,16 @@ namespace PWBFuelBalancer
                     GUILayout.EndHorizontal();
 
                 }
+                else
+                {
+                    GUILayout.FlexibleSpace();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.FlexibleSpace();
+                    GUILayout.Label("No Fuel Balancers mounted");
+                    GUILayout.FlexibleSpace();
+                    GUILayout.EndHorizontal();
+                    GUILayout.FlexibleSpace();
+                }
                 GUILayout.EndVertical();
                 GUI.DragWindow();
             }
@@ -334,7 +376,7 @@ namespace PWBFuelBalancer
 
         public void OnDestroy()
         {
-            //Debug.Log("PWBFuelBalancerAddon::OnDestroy");
+            Log.Info("PWBFuelBalancerAddon::OnDestroy");
 
             GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
             GameEvents.onVesselChange.Remove(OnVesselChange);
@@ -342,11 +384,18 @@ namespace PWBFuelBalancer
             GameEvents.onEditorShipModified.Remove(OnEditorShipModified);
             GameEvents.onFlightReady.Remove(OnFlightReady);
             GameEvents.onGameSceneLoadRequested.Remove(OnGameSceneLoadRequested);
+            GameEvents.onEditorLoad.Remove(this.OnEditorLoad);
+
 
             // Remove the stock toolbar button
             GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
-            if (_stockToolbarButton != null)
-                ApplicationLauncher.Instance.RemoveModApplication(_stockToolbarButton);
+            //if (_stockToolbarButton != null)
+            //    ApplicationLauncher.Instance.RemoveModApplication(_stockToolbarButton);
+            if (toolbarControl != null)
+            {
+                toolbarControl.OnDestroy();
+                Destroy(toolbarControl);
+            }
         }
 
         private void BuildBalancerList()
@@ -399,33 +448,38 @@ namespace PWBFuelBalancer
         // This event is fired when the vessel is changed. If this happens we need to rebuild the list of balancers in the vessel.
         private void OnVesselChange(Vessel data)
         {
-            //Debug.Log("Calling BuildBalancerList from OnVesselChange");
+            Log.Info("Calling BuildBalancerList from OnVesselChange");
             BuildBalancerList(data);
         }
 
         private void OnVesselWasModified(Vessel data)
         {
-            //Debug.Log("Calling RebuildCLSVessel from OnVesselWasModified");
-
+            Log.Info("Calling RebuildCLSVessel from OnVesselWasModified");
             BuildBalancerList(data);
         }
 
         private void OnFlightReady()
         {
             // Now build the list of balancers
-            //Debug.Log("Calling BuildBalancerList from onFlightReady");
+            Log.Info("Calling BuildBalancerList from onFlightReady");
             BuildBalancerList();
         }
 
         private void OnVesselLoaded(Vessel data)
         {
-            //Debug.Log("Calling BuildBalancerList from OnVesselLoaded");
+            Log.Info("Calling BuildBalancerList from OnVesselLoaded");
             BuildBalancerList();
         }
         private void OnEditorShipModified(ShipConstruct vesselConstruct)
         {
-            //Debug.Log("Calling BuildBalancerList from OnEditorShipModified");
+            Log.Info("Calling BuildBalancerList from OnEditorShipModified, _editorPartCount: " + _editorPartCount + ", vesselConstruct.Parts.Count: " + vesselConstruct.Parts.Count);
             if (vesselConstruct.Parts.Count == _editorPartCount) return;
+            BuildBalancerList(vesselConstruct.Parts);
+            _editorPartCount = vesselConstruct.parts.Count;
+        }
+        private void OnEditorLoad(ShipConstruct vesselConstruct, CraftBrowserDialog.LoadType loadType)
+        {
+            Log.Info("Calling BuildBalancerList from OnEditorLoad, vesselConstruct.Parts.Count: " + vesselConstruct.Parts.Count);
             BuildBalancerList(vesselConstruct.Parts);
             _editorPartCount = vesselConstruct.parts.Count;
         }

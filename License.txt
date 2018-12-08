@@ -1,0 +1,10 @@
+License:  CC By 3.0
+https://creativecommons.org/licenses/by/3.0/
+
+Original Author:  codepoet (Phil Bowden)
+Second Author: Papa_Joe (Joe Korinek)
+Current Maintainer: Linuxgurugamer
+
+All credit goes to original author. 
+
+Source Code:  https://github.com/linuxgurugamer/PWBFuelBalancer
