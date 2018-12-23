@@ -3,9 +3,10 @@
   "URL": "http://ksp.spacetux.net/avc/PWBFuelBalancerRestored",
   "DOWNLOAD": "https://github.com/linuxgurugamer/PWBFuelBalancerRestored/releases",
   "CHANGE_LOG_URL": "https://forum.kerbalspaceprogram.com/index.php?/topic/180409-15-pwb-fuel-balancer-restored/",
-  "GITHUB": {
-    "USERNAME": "linuxgurugamer",
-    "REPOSITORY": "PWBFuelBalancerRestored"
+  "GITHUB" :
+  {
+      "USERNAME" : "linuxgurugamer",
+      "REPOSITORY" : "PWBFuelBalancerRestored"
   },
   "VERSION": {
     "MAJOR": 0,
