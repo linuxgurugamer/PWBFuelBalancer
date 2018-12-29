@@ -133,7 +133,8 @@ namespace PWBFuelBalancer
                 while (resources.MoveNext())
                 {
                     if (resources.Current == null) continue;
-                    if (((PartResource)resources.Current).info.density > 0)
+                    if (((PartResource)resources.Current).info.density > 0 &&
+                        ((PartResource)resources.Current).flowState)
                     { // Only consider resources that have mass (don't move electricity!)
                         _tanks.Add(new PartAndResource(parts.Current, (PartResource)resources.Current));
                     }
@@ -322,7 +323,7 @@ namespace PWBFuelBalancer
 
         private bool SetCoMTarget()
         {
-            bool initalOff = false;
+            //bool initalOff = false;
 #if false
             // We are depending on the CoM indicator for the location of the CoM which is a bit rubbish :( There ust be a better way of doing this!
             EditorMarker_CoM coM = (EditorMarker_CoM)FindObjectOfType(typeof(EditorMarker_CoM));
