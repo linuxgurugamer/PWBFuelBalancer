@@ -1,3 +1,8 @@
+0.1.5.2
+	Improved the locked tank code
+	Added ability to jettison resources.  Currently a max of 3 resources are available per part,and empties at a rateof 1%/sec
+	Optimized code by replacing string comparisions with an Enum. Kept the string for display purposes
+
 0.1.5.1
 	Fixed bug where locked tanks would still be filled/emptied
 

@@ -47,6 +47,9 @@ namespace PWBFuelBalancer
         [KSPField(isPersistant = true)]
         public Quaternion RotationInEditor;
 
+        enum BalanceStatus  {Deactivated, Maintaining, Balancing, Standby, Balance_not_possible };
+        BalanceStatus balanceStatus;
+
         [KSPField(isPersistant = false, guiActive = true, guiName = "Status")]
         public string Status;
 
@@ -62,6 +65,7 @@ namespace PWBFuelBalancer
         [KSPEvent(guiActive = true, guiName = "Deactivate", active = false)]
         public void Disable()
         {
+            balanceStatus = BalanceStatus.Deactivated;
             Status = "Deactivated";
             Events["Disable"].active = false;
             Events["BalanceFuel"].active = true;
@@ -75,7 +79,7 @@ namespace PWBFuelBalancer
         public void Maintain()
         {
             // If we were previously Deactivated then we need to build a list of tanks and set up to start balancing
-            if (Status == "Deactivated" || Status == "Balance not possible")
+            if (balanceStatus == BalanceStatus.Deactivated || balanceStatus == BalanceStatus.Balance_not_possible)
             {
                 BuildTanksList();
 
@@ -88,6 +92,7 @@ namespace PWBFuelBalancer
             Events["Disable"].active = true;
             Events["BalanceFuel"].active = false;
             Events["Maintain"].active = false;
+            balanceStatus = BalanceStatus.Maintaining;
             Status = "Maintaining";
         }
 
@@ -102,7 +107,7 @@ namespace PWBFuelBalancer
         public void BalanceFuel()
         {
             // If we were previousyl deactive, then we need to build the loist of tanks and set up to start balancing
-            if (Status == "Deactivated" || Status == "Balance not possible")
+            if (balanceStatus == BalanceStatus.Deactivated || balanceStatus == BalanceStatus.Balance_not_possible)
             {
                 BuildTanksList();
 
@@ -115,6 +120,7 @@ namespace PWBFuelBalancer
             Events["Disable"].active = true;
             Events["BalanceFuel"].active = false;
             Events["Maintain"].active = false;
+            balanceStatus = BalanceStatus.Balancing;
             Status = "Balancing";
         }
 
@@ -133,8 +139,7 @@ namespace PWBFuelBalancer
                 while (resources.MoveNext())
                 {
                     if (resources.Current == null) continue;
-                    if (((PartResource)resources.Current).info.density > 0 &&
-                        ((PartResource)resources.Current).flowState)
+                    if (((PartResource)resources.Current).info.density > 0 )
                     { // Only consider resources that have mass (don't move electricity!)
                         _tanks.Add(new PartAndResource(parts.Current, (PartResource)resources.Current));
                     }
@@ -170,6 +175,7 @@ namespace PWBFuelBalancer
         {
             Log.Info("PWBKSPFueBalancer::OnStart");
             // Set the status to be deactivated
+            balanceStatus = BalanceStatus.Deactivated;
             Status = "Deactivated";
             _osd = new Osd();
             _fStartingMoveAmount = 1; // TODO change this to reflect flow rates and the physics frame rate
@@ -216,12 +222,13 @@ namespace PWBFuelBalancer
             // Update the ComError (hopefully this will not kill our performance)
             FComError = CalculateCoMFromTargetCoM(part.vessel.CoM);
 
-            if (Status == "Deactivated" || Status == "Balance not possible") return;
+            if (balanceStatus == BalanceStatus.Deactivated || balanceStatus == BalanceStatus.Balance_not_possible) return;
             if (FComError < 0.002)
             {
                 // The error is so small we need not worry anymore
-                if (Status == "Balancing")
+                if (balanceStatus == BalanceStatus.Balancing)
                 {
+                    balanceStatus = BalanceStatus.Deactivated;
                     Status = "Deactivated";
                     Events["Disable"].active = false;
                     Events["BalanceFuel"].active = true;
@@ -230,9 +237,10 @@ namespace PWBFuelBalancer
                     // Clear the list of tanks. They will have to be rebuilt next time balancing is enabled
                     _tanks = null;
                 }
-                else if (Status == "Maintaining")
+                else if (balanceStatus == BalanceStatus.Maintaining)
                 {
                     // Move from a maintaining state to a standby one. If the error increases we con mvoe back to a maintining state
+                    balanceStatus = BalanceStatus.Standby;
                     Status = "Standby";
 
                     _iNextSourceTank = 0;
@@ -244,11 +252,12 @@ namespace PWBFuelBalancer
             else
             {
                 // There is an error
-                if (Status == "Standby")
+                if (balanceStatus == BalanceStatus.Standby)
                 {
                     // is the error large enough to get us back into a maintaining mode?
                     if (FComError > 0.002 * 2)
                     {
+                        balanceStatus = BalanceStatus.Maintaining;
                         Status = "Maintaining";
                     }
                 }
@@ -485,8 +494,8 @@ namespace PWBFuelBalancer
                 PartResource resource1 = ((PartAndResource)_tanks[_iNextSourceTank]).Resource;
                 Part part1 = ((PartAndResource)_tanks[_iNextSourceTank]).Part;
 
-                // Only process nonempty tanks.
-                if (resource1.amount > 0)
+                // Only process nonempty tanks, and tanks that are not locked.
+                if (resource1.amount > 0 && resource1.flowState)
                 {
                     // Only move resources that have mass (don't move electricity!)
                     if (resource1.info.density > 0)
@@ -504,8 +513,8 @@ namespace PWBFuelBalancer
                             PartResource resource2 = ((PartAndResource)_tanks[_iNextDestinationTank]).Resource;
                             Part part2 = ((PartAndResource)_tanks[_iNextDestinationTank]).Part;
 
-                            // Check that the resources are of the same type 
-                            if (resource2.resourceName == resource1.resourceName)
+                            // Check that the resources are of the same type  and the tank is not locked
+                            if (resource2.resourceName == resource1.resourceName && resource2.flowState)
                             {
                                 // Clamp resource quantity by the amount available in the two tanks.
                                 float moveAmount = (float)Math.Min(_fNextAmountMoved, resource1.amount);
@@ -593,13 +602,14 @@ namespace PWBFuelBalancer
                     if (_fNextAmountMoved < 0.0005)
                     {
                         // Since perfect balance is not possible, we need to move into an appropriate state.If we are trying to maiintain blanace then we will keep trying trying again with larger amounts. If we were trying for a single balance then move to a state that shows it is not possible.
-                        if (Status == "Maintaining")
+                        if (balanceStatus == BalanceStatus.Maintaining)
                         {
                             _fNextAmountMoved = _fStartingMoveAmount;
                             Events["Disable"].active = true;
                         }
                         else
                         {
+                            balanceStatus = BalanceStatus.Balance_not_possible;
                             Status = "Balance not possible";
                             Events["Disable"].active = true;
                             Events["BalanceFuel"].active = true;

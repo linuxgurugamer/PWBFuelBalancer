@@ -47,6 +47,7 @@
     </Compile>
     <Compile Include="GuiUtils.cs" />
     <Compile Include="InFlightMarkerCam.cs" />
+    <Compile Include="Jettison.cs" />
     <Compile Include="Log.cs" />
     <Compile Include="MarkerCamBehaviour.cs" />
     <Compile Include="ModulePWBFuelBalancer.cs" />
