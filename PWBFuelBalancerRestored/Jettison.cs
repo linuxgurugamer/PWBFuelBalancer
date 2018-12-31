@@ -10,7 +10,7 @@ namespace PWBFuelBalancer
         internal bool jettisonRes2 = false;
         internal bool jettisonRes3 = false;
 
-        List<PartResource> partResources = new List<PartResource>();
+        List<int> pr = new List<int>();
         static List<string> allPartResources = null;
         
 
@@ -19,33 +19,33 @@ namespace PWBFuelBalancer
             jettisonRes = !jettisonRes;
             string eventName = "JettisonRes" + i;
             if (jettisonRes)
-                Events[eventName].guiName = "Stop jettisoning " + partResources[i - 1].info.displayName;
+                Events[eventName].guiName = "Stop jettisoning " + part.Resources[pr[i - 1]].info.displayName;
             else
-                Events[eventName].guiName = "Jettison " + partResources[i - 1].info.displayName;
+                Events[eventName].guiName = "Jettison " + part.Resources[pr[i - 1]].info.displayName;
         }
         
         void DoJettisonAll(int resourceNum)
         {
-            string resourceName = this.partResources[resourceNum].resourceName;
+            string resourceName = part.Resources[pr[resourceNum]].resourceName;
 
-            if (allPartResources.Contains(partResources[resourceNum].resourceName))
+            if (allPartResources.Contains(part.Resources[pr[resourceNum]].resourceName))
             {
                 foreach (var p in this.vessel.Parts)
                 {
                     var m = p.Modules.GetModule<Jettison>();
                     if (m != null)
                     {
-                        for (int r = m.partResources.Count - 1; r >= 0; r--)
+                        for (int r = m.pr.Count - 1; r >= 0; r--)
                         {
-                            if (m.partResources[r].resourceName == resourceName && m.partResources[r].flowState)
+                            if (part.Resources[m.pr[r]].resourceName == resourceName && part.Resources[m.pr[r]].flowState)
                             {
                                 string eventName = "JettisonAllRes" + (r + 1);
-                                m.Events[eventName].guiName = "Jettison all " + this.partResources[resourceNum].info.displayName;
+                                m.Events[eventName].guiName = "Jettison all " + part.Resources[pr[resourceNum]].info.displayName;
                             }
                         }
                     }
                 }
-                allPartResources.Remove(partResources[resourceNum].resourceName);
+                allPartResources.Remove(part.Resources[pr[resourceNum]].resourceName);
             }
             else
             {
@@ -54,17 +54,17 @@ namespace PWBFuelBalancer
                     var m = p.Modules.GetModule<Jettison>();
                     if (m != null)
                     {
-                        for (int r = m.partResources.Count - 1; r >= 0; r--)
+                        for (int r = m.pr.Count - 1; r >= 0; r--)
                         {
-                            if (m.partResources[r].resourceName == resourceName && m.partResources[r].flowState)
+                            if (part.Resources[m.pr[r]].resourceName == resourceName && part.Resources[m.pr[r]].flowState)
                             {
                                 string eventName = "JettisonAllRes" + (r + 1);
-                                m.Events[eventName].guiName = "Stop jettisoning all " + m.partResources[r].info.displayName;
+                                m.Events[eventName].guiName = "Stop jettisoning all " + part.Resources[m.pr[r]].info.displayName;
                             }
                         }
                     }
                 }
-                allPartResources.Add(partResources[resourceNum].resourceName);
+                allPartResources.Add(part.Resources[pr[resourceNum]].resourceName);
             }
         }
 
@@ -103,23 +103,30 @@ namespace PWBFuelBalancer
         {
             DoJettisonAll(2);
         }
-
+        int i0 = 0;
         public void LateUpdate()
         {
-            if (jettisonRes1 && !allPartResources.Contains(partResources[0].resourceName))
-                jettisonRes1 = DoJettison(partResources[0]);
-            if (jettisonRes2 && !allPartResources.Contains(partResources[1].resourceName))
-                jettisonRes2 = DoJettison(partResources[1]);
-            if (jettisonRes3 && !allPartResources.Contains(partResources[2].resourceName))
-                jettisonRes3 = DoJettison(partResources[2]);
-
+            if (jettisonRes1 && !allPartResources.Contains(part.Resources[pr[0]].resourceName))
+                jettisonRes1 = DoJettison(part.Resources[pr[0]]);
+            if (jettisonRes2 && !allPartResources.Contains(part.Resources[pr[1]].resourceName))
+                jettisonRes2 = DoJettison(part.Resources[pr[1]]);
+            if (jettisonRes3 && !allPartResources.Contains(part.Resources[pr[2]].resourceName))
+                jettisonRes3 = DoJettison(part.Resources[pr[2]]);
+            i0++;
+            Log.Info("LateUpdate, i0: " + i0 + ",  part: " + this.part.partInfo.title + ", allPartResources.Count: " + allPartResources.Count + ", partResources.Count: " + pr.Count);
             for (int i = allPartResources.Count - 1; i >= 0; i--)
             {
-                for (int i1 = partResources.Count - 1; i1 >= 0; i1--)
+                for (int i1 = pr.Count - 1; i1 >= 0; i1--)
                 {
-                    if (allPartResources[i] == partResources[i1].resourceName && partResources[i1].flowState)
+                    if (i0 == 20)
                     {
-                        DoJettison(partResources[i1]);
+                        Log.Info("LateUpdate, allPartResources[i]: " + allPartResources[i] + ", partResources[i1].resourceName: " + part.Resources[pr[i1]].resourceName +
+                            ", flowState: " + part.Resources[pr[i1]].flowState + ", _flowState: " + part.Resources[pr[i1]]._flowState);
+                        i0 = 0;
+                    }
+                    if (allPartResources[i] == part.Resources[pr[i1]].resourceName && part.Resources[pr[i1]].flowState)
+                    {
+                        DoJettison(part.Resources[pr[i1]]);
                         break;
                     }
                 }
@@ -129,6 +136,7 @@ namespace PWBFuelBalancer
 
         bool DoJettison(PartResource r)
         {
+            Log.Info("DoJettison, partResource: " + r.info.displayName + ", r.amount: " + r.amount);
             if (r.amount > 0f)
             {
                 r.amount -= Math.Max(0, r.maxAmount / 2000);
@@ -146,8 +154,10 @@ namespace PWBFuelBalancer
             }
             int count = 0;
 
-            foreach (PartResource resource in part.Resources)
+            for (int r = part.Resources.Count - 1; r >= 0; r--)
+            //foreach (PartResource resource in part.Resources)
             {
+                var resource = part.Resources[r];
                 if (resource.resourceName != "Ore" &&
                     resource.resourceName != "Ablator" &&
                     resource.resourceName != "SolidFuel" &&
@@ -156,7 +166,7 @@ namespace PWBFuelBalancer
                     count++;
                     if (count <= 3)
                     {
-                        partResources.Add(resource);
+                        pr.Add(r);
                         string eventName = "JettisonRes" + count;
                         string allEventName = "JettisonAllRes" + count;
 

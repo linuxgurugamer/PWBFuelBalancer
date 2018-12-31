@@ -1,3 +1,6 @@
+0.1.5.3
+	Fixed a problem with the jettison code, which was failing on vessels with many parts & tanks
+
 0.1.5.2
 	Improved the locked tank code
 	Added ability to jettison resources.  Currently a max of 3 resources are available per part,and empties at a rateof 1%/sec
