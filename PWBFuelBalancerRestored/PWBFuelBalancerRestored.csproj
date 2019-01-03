@@ -58,6 +58,7 @@
     <Compile Include="PWBFuelBalancerAddon.cs" />
     <Compile Include="PwbkspFuelBalancer.cs" />
     <Compile Include="SavedCoMMarker.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="ToolbarRegistration.cs" />
   </ItemGroup>
   <ItemGroup>

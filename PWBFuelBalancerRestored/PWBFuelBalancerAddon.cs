@@ -43,8 +43,6 @@ namespace PWBFuelBalancer
 
         public void Awake()
         {
-            Log.Info("PWBFuelBalancerAddon:Awake");
-
             // create the list of balancers
             _listFuelBalancers = new List<ModulePWBFuelBalancer>();
 
@@ -64,7 +62,6 @@ namespace PWBFuelBalancer
 
         public void Start()
         {
-            Log.Info("PWBFuelBalancerAddon:Start");
             _currentWindowPosition = HighLogic.LoadedSceneIsEditor ? _windowPositionEditor : _windowPositionFlight;
             _windowStyle = new GUIStyle(HighLogic.Skin.window);
 
@@ -354,8 +351,6 @@ namespace PWBFuelBalancer
 
         public void OnDestroy()
         {
-            Log.Info("PWBFuelBalancerAddon::OnDestroy");
-
             GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
             GameEvents.onVesselChange.Remove(OnVesselChange);
             GameEvents.onVesselLoaded.Remove(OnVesselLoaded);
@@ -426,38 +421,32 @@ namespace PWBFuelBalancer
         // This event is fired when the vessel is changed. If this happens we need to rebuild the list of balancers in the vessel.
         private void OnVesselChange(Vessel data)
         {
-            Log.Info("Calling BuildBalancerList from OnVesselChange");
             BuildBalancerList(data);
         }
 
         private void OnVesselWasModified(Vessel data)
         {
-            Log.Info("Calling RebuildCLSVessel from OnVesselWasModified");
             BuildBalancerList(data);
         }
 
         private void OnFlightReady()
         {
             // Now build the list of balancers
-            Log.Info("Calling BuildBalancerList from onFlightReady");
             BuildBalancerList();
         }
 
         private void OnVesselLoaded(Vessel data)
         {
-            Log.Info("Calling BuildBalancerList from OnVesselLoaded");
             BuildBalancerList();
         }
         private void OnEditorShipModified(ShipConstruct vesselConstruct)
         {
-            Log.Info("Calling BuildBalancerList from OnEditorShipModified, _editorPartCount: " + _editorPartCount + ", vesselConstruct.Parts.Count: " + vesselConstruct.Parts.Count);
             if (vesselConstruct.Parts.Count == _editorPartCount) return;
             BuildBalancerList(vesselConstruct.Parts);
             _editorPartCount = vesselConstruct.parts.Count;
         }
         private void OnEditorLoad(ShipConstruct vesselConstruct, CraftBrowserDialog.LoadType loadType)
         {
-            Log.Info("Calling BuildBalancerList from OnEditorLoad, vesselConstruct.Parts.Count: " + vesselConstruct.Parts.Count);
             BuildBalancerList(vesselConstruct.Parts);
             _editorPartCount = vesselConstruct.parts.Count;
         }

@@ -19,3 +19,4 @@ part, and choosing "toggle marker"
 
 There is also a GUI that can be activated via the app launcher that allows to the manual 
 positioning of the CoM target, both in the VAB and in flight.
+

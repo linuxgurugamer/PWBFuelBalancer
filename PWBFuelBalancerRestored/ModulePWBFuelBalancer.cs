@@ -162,7 +162,6 @@ namespace PWBFuelBalancer
         /// </summary>
         public override void OnAwake()
         {
-            Log.Info("PWBKSPFueBalancer::OnAwake");
             _tanks = null;
             MarkerVisible = false;
         }
@@ -173,7 +172,6 @@ namespace PWBFuelBalancer
         /// </summary>
         public override void OnStart(StartState state)
         {
-            Log.Info("PWBKSPFueBalancer::OnStart");
             // Set the status to be deactivated
             balanceStatus = BalanceStatus.Deactivated;
             Status = "Deactivated";
@@ -193,9 +191,9 @@ namespace PWBFuelBalancer
 
         public  void Destroy()
         {
-            Log.Info("ModulePWBFuelBalancer.Destroy");
             GameEvents.onEditorPartPlaced.Remove(OnEditorPartPlaced);
         }
+
         void OnEditorPartPlaced(Part p)
         {
             if (p == this.part)
@@ -318,6 +316,7 @@ namespace PWBFuelBalancer
 
 
             {
+#if false
                 if (HighLogic.LoadedSceneIsFlight)
                 {
                     Log.Info("vessel.transform.rotation : " + this.vessel.transform.rotation);
@@ -327,12 +326,15 @@ namespace PWBFuelBalancer
 
                     Log.Info("upaxis: " + (Vector3)(Quaternion.Inverse(this.vessel.transform.rotation) *this.vessel.upAxis ));
                 }
+#endif
             }
         }
 
         private bool SetCoMTarget()
         {
             //bool initalOff = false;
+
+            // Following code replaced by EditorMarker_CoM.findCenterOfMass(EditorLogic.RootPart);
 #if false
             // We are depending on the CoM indicator for the location of the CoM which is a bit rubbish :( There ust be a better way of doing this!
             EditorMarker_CoM coM = (EditorMarker_CoM)FindObjectOfType(typeof(EditorMarker_CoM));
@@ -359,7 +361,7 @@ namespace PWBFuelBalancer
                 // get the location of the centre of mass
                 //print("Com position: " + CoM.transform.position);
                 //Vector3 vecCom = coM.transform.position;
-                
+
                 //Log.Info("vecCom: " + vecCom);
                 //Log.Info("coM.findCenterOfMass: " + EditorMarker_CoM.findCenterOfMass(EditorLogic.RootPart));
                 Vector3 vecCom = EditorMarker_CoM.findCenterOfMass(EditorLogic.RootPart);
@@ -401,11 +403,9 @@ namespace PWBFuelBalancer
 
         private void CreateSavedComMarker()
         {
-            Log.Info("CreateSavedComMarker");
             if (SavedCoMMarker == null)
                 Log.Info("SavedCoMMarker is null");
-
-
+            
             // Do not try to create the marker if it already exisits
             if (null != SavedCoMMarker) return;
             // First try to find the camera that will be used to display the marker - it needs a special camera to make it "float"

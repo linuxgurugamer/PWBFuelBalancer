@@ -1,3 +1,9 @@
+0.1.5.4
+	Fixed jettison code to work properly on multiple vessels and on scene switches
+	Added Settings page to specify whether jettison should continue when switching scenes
+	Added edge pulsing to show which parts are venting
+	Added color settings sliders to settings page
+
 0.1.5.3
 	Fixed a problem with the jettison code, which was failing on vessels with many parts & tanks
 
