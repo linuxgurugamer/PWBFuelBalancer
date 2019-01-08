@@ -1,3 +1,7 @@
+0.1.5.5
+	Added toggles for Saved CoM and Actual CoM
+	Added flag to use KSP skin
+
 0.1.5.4
 	Fixed jettison code to work properly on multiple vessels and on scene switches
 	Added Settings page to specify whether jettison should continue when switching scenes

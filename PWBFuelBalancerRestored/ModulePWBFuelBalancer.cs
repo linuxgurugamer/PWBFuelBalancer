@@ -17,6 +17,8 @@ namespace PWBFuelBalancer
         public GameObject SavedCoMMarker;
         public GameObject ActualCoMMarker;
         public bool MarkerVisible;
+        public bool SavedCoMMarkerVisible;
+        public bool ActualCoMMarkerVisible;
 
         private bool _started; // used to tell if we are set up and good to go. The Update method will check this know if it is a good idea to try to go anything or not.
         private DateTime _lastKeyInputTime;
@@ -164,7 +166,9 @@ namespace PWBFuelBalancer
         {
             _tanks = null;
             MarkerVisible = false;
-        }
+            SavedCoMMarkerVisible = false;
+            ActualCoMMarkerVisible = false;
+    }
 
         /// <summary>
         /// Called during the Part startup.
@@ -275,14 +279,14 @@ namespace PWBFuelBalancer
             return (distanceFromCoMToTarget);
         }
 
-
+#if false
         private void DumpConfigNode(ConfigNode node)
         {
             print("ConfigNode: name: " + node.name + " id: " + node.id);
             print("values: ");
             print("ToString: " + node);
         }
-
+#endif
         public void OnMouseOver()
         {
             if (!HighLogic.LoadedSceneIsEditor) return;
@@ -302,17 +306,21 @@ namespace PWBFuelBalancer
             }
         }
 
-        [KSPEvent(guiActive = true, guiName = "Toggle Marker", active = true)]
+        [KSPEvent(guiActive = true, guiName = "Toggle All Markers", active = true)]
         public void ToggleMarker()
         {
             MarkerVisible = !MarkerVisible;
+
+            SavedCoMMarkerVisible = !SavedCoMMarkerVisible;
+            ActualCoMMarkerVisible = !ActualCoMMarkerVisible;
 
             // If we are in mapview then hide the marker
             if (SavedCoMMarker != null) SavedCoMMarker.SetActive(!MapView.MapIsEnabled && MarkerVisible);
 
             if (ActualCoMMarker != null) ActualCoMMarker.SetActive(!MapView.MapIsEnabled && MarkerVisible);
 
-            if (InFlightMarkerCam.MarkerCam != null) InFlightMarkerCam.MarkerCam.enabled = !MapView.MapIsEnabled && MarkerVisible;
+            if (InFlightMarkerCam.MarkerCam != null)
+                InFlightMarkerCam.MarkerCam.enabled = !MapView.MapIsEnabled && (ActualCoMMarkerVisible || SavedCoMMarkerVisible);
 
 
             {
@@ -329,6 +337,43 @@ namespace PWBFuelBalancer
 #endif
             }
         }
+
+        [KSPEvent(guiActive = true, guiName = "Toggle Saved CoM Marker on", active = true)]
+        public void ToggleSavedMarker()
+        {
+            SavedCoMMarkerVisible = !SavedCoMMarkerVisible;
+            if (SavedCoMMarkerVisible)
+                Events["ToggleSavedMarker"].guiName = "Toggle Saved CoM Marker off";
+            else
+                Events["ToggleSavedMarker"].guiName = "Toggle Saved CoM Marker on";
+
+            // If we are in mapview then hide the marker
+            if (SavedCoMMarker != null) SavedCoMMarker.SetActive(!MapView.MapIsEnabled && SavedCoMMarkerVisible);
+
+            if (ActualCoMMarker != null) ActualCoMMarker.SetActive(!MapView.MapIsEnabled && ActualCoMMarkerVisible);
+
+            if (InFlightMarkerCam.MarkerCam != null)
+                InFlightMarkerCam.MarkerCam.enabled = !MapView.MapIsEnabled && (ActualCoMMarkerVisible || SavedCoMMarkerVisible);
+        }
+
+        [KSPEvent(guiActive = true, guiName = "Toggle Actual CoM Marker on", active = true)]
+        public void ToggleActualMarker()
+        {
+            ActualCoMMarkerVisible = !ActualCoMMarkerVisible;
+            if (ActualCoMMarkerVisible)
+                Events["ToggleActualMarker"].guiName = "Toggle Actual CoM Marker off";
+            else
+                Events["ToggleActualMarker"].guiName = "Toggle Actual CoM Marker on";
+
+            // If we are in mapview then hide the marker
+            if (SavedCoMMarker != null) SavedCoMMarker.SetActive(!MapView.MapIsEnabled && SavedCoMMarkerVisible);
+
+            if (ActualCoMMarker != null) ActualCoMMarker.SetActive(!MapView.MapIsEnabled && ActualCoMMarkerVisible);
+
+            if (InFlightMarkerCam.MarkerCam != null)
+                InFlightMarkerCam.MarkerCam.enabled = !MapView.MapIsEnabled && (ActualCoMMarkerVisible || SavedCoMMarkerVisible);
+        }
+
 
         private bool SetCoMTarget()
         {

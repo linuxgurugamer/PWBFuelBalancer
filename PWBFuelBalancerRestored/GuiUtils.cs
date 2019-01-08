@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using ClickThroughFix;
 
 namespace PWBFuelBalancer
 {
@@ -52,23 +53,23 @@ namespace PWBFuelBalancer
 
       static ComboBox()
       {
-        Texture2D background = new Texture2D(16, 16, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
+        Texture2D mybackground = new Texture2D(16, 16, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp };
 
-        for (int x = 0; x < background.width; x++)
-          for (int y = 0; y < background.height; y++)
+        for (int x = 0; x < mybackground.width; x++)
+          for (int y = 0; y < mybackground.height; y++)
           {
-            if (x == 0 || x == background.width - 1 || y == 0 || y == background.height - 1)
-              background.SetPixel(x, y, new Color(0, 0, 0, 1));
+            if (x == 0 || x == mybackground.width - 1 || y == 0 || y == mybackground.height - 1)
+              mybackground.SetPixel(x, y, new Color(0, 0, 0, 1));
             else
-              background.SetPixel(x, y, new Color(0.05f, 0.05f, 0.05f, 0.95f));
+              mybackground.SetPixel(x, y, new Color(0.05f, 0.05f, 0.05f, 0.95f));
           }
 
-        background.Apply();
+        mybackground.Apply();
 
         _style = new GUIStyle(GUI.skin.window)
         {
-          normal = { background = background },
-          onNormal = { background = background }
+          normal = { background = mybackground },
+          onNormal = { background = mybackground }
         };
         _style.border.top = _style.border.bottom;
         _style.padding.top = _style.padding.bottom;
@@ -85,7 +86,7 @@ namespace PWBFuelBalancer
         _rect.x = Math.Max(0, Math.Min(_rect.x, Screen.width - _rect.width));
         _rect.y = Math.Max(0, Math.Min(_rect.y, Screen.height - _rect.height));
 
-        _rect = GUILayout.Window(_id, _rect, identifier =>
+        _rect = ClickThruBlocker.GUILayoutWindow(_id, _rect, identifier =>
         {
           _selectedItem = GUILayout.SelectionGrid(-1, _entries, 1, YellowOnHover);
           if (GUI.changed)

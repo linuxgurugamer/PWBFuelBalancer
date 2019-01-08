@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using KSP.UI.Screens;
 using UnityEngine;
+
+using ClickThroughFix;
 using ToolbarControl_NS;
 
 namespace PWBFuelBalancer
@@ -12,16 +14,14 @@ namespace PWBFuelBalancer
         // The Addon on keeps a reference to all the PWBFuelBalancers in the current vessel. If the current vessel changes or is modified then this list will need to be rebuilt.
         private List<ModulePWBFuelBalancer> _listFuelBalancers;
 
-        private static Rect _windowPositionEditor = new Rect(265, 90, 360, 480);
-        private static Rect _windowPositionFlight = new Rect(150, 50, 360, 480);
+        private static Rect _windowPositionEditor = new Rect(265, 90, 400, 36);
+        private static Rect _windowPositionFlight = new Rect(150, 50, 360, 36);
         private static Rect _currentWindowPosition;
         private static GUIStyle _windowStyle;
-        private bool _weLockedInputs;
-
-        //private ApplicationLauncherButton _stockToolbarButton; // Stock Toolbar Button
+                
         ToolbarControl toolbarControl;
 
-        private bool _visable;
+        private bool _visible;
 
         private int _editorPartCount;
 
@@ -41,15 +41,14 @@ namespace PWBFuelBalancer
             }
         }
 
+ 
         public void Awake()
         {
             // create the list of balancers
             _listFuelBalancers = new List<ModulePWBFuelBalancer>();
 
-            // Set up the stock toolbar
-            //.onGUIApplicationLauncherReady.Add(OnGuiAppLauncherReady);
-            //GameEvents.onGUIApplicationLauncherDestroyed.Add(OnGuiAppLauncherDestroyed);
-            OnGuiAppLauncherReady();
+
+            InitializeToolbar();
 
             GameEvents.onVesselWasModified.Add(OnVesselWasModified);
             GameEvents.onVesselChange.Add(OnVesselChange);
@@ -84,7 +83,7 @@ namespace PWBFuelBalancer
         internal const string MODID = "PWBFuelBalancer_NS";
         internal const string MODNAME = "PWB Fuel Balancer";
 
-        private void OnGuiAppLauncherReady()
+        private void InitializeToolbar()
         {
             toolbarControl = gameObject.AddComponent<ToolbarControl>();
             toolbarControl.AddToAllToolbars(OnAppLaunchToggle, OnAppLaunchToggle,
@@ -103,7 +102,7 @@ namespace PWBFuelBalancer
         private void OnAppLaunchToggle()
         {
 
-            _visable = !_visable;
+            _visible = !_visible;
         }
 
 
@@ -111,59 +110,30 @@ namespace PWBFuelBalancer
 
         private void OnGUI()
         {
-            if (_visable)
+            if (_visible)
             {
                 //Set the GUI Skin
-                //GUI.skin = HighLogic.Skin;
-                _currentWindowPosition = GUILayout.Window(947695, _currentWindowPosition, OnWindow, "PWB Fuel Balancer", _windowStyle, GUILayout.MinHeight(20), GUILayout.MinWidth(100), GUILayout.ExpandHeight(true));
+                if (HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().useKSPskin)
+                    GUI.skin = HighLogic.Skin;
+                _currentWindowPosition = ClickThruBlocker.GUILayoutWindow(947695, _currentWindowPosition, OnWindow, "PWB Fuel Balancer", _windowStyle, GUILayout.MinHeight(20), GUILayout.MinWidth(100), GUILayout.ExpandHeight(true));
             }
 
             GuiUtils.ComboBox.DrawGui();
-
-            // If the mouse is over our window, then lock the rest of the UI
-            //if (HighLogic.LoadedSceneIsEditor) PreventEditorClickthrough();
-            //if (HighLogic.LoadedSceneIsFlight || HighLogic.LoadedSceneHasPlanetarium) PreventInFlightClickthrough();
         }
 
-        private bool MouseIsOverWindow()
-        {
-            return _visable
-                   && _currentWindowPosition.Contains(new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y));
-        }
-
-        //Lifted this more or less directly from the Kerbal Engineer source. Thanks cybutek!
-        private void PreventEditorClickthrough()
-        {
-            bool mouseOverWindow = MouseIsOverWindow();
-            if (!_weLockedInputs && mouseOverWindow)
-            {
-                EditorLogic.fetch.Lock(true, true, true, "PWBFuelBalancer_click");
-                _weLockedInputs = true;
-            }
-            if (!_weLockedInputs || mouseOverWindow) return;
-            EditorLogic.fetch.Unlock("PWBFuelBalancer_click");
-            _weLockedInputs = false;
-        }
-
-        private void PreventInFlightClickthrough()
-        {
-            bool mouseOverWindow = MouseIsOverWindow();
-            if (!_weLockedInputs && mouseOverWindow)
-            {
-                InputLockManager.SetControlLock(ControlTypes.CAMERACONTROLS | ControlTypes.MAP, "PWBFuelBalancer_click");
-                _weLockedInputs = true;
-            }
-            if (!_weLockedInputs || mouseOverWindow) return;
-            InputLockManager.RemoveControlLock("PWBFuelBalancer_click");
-            _weLockedInputs = false;
-        }
 
         private void OnWindow(int windowId)
         {
             try
             {
+                GUIStyle buttonStyle = new GUIStyle( GUI.skin.button);
+                buttonStyle.normal.textColor = Color.white;
+                buttonStyle.fontStyle = FontStyle.Bold;
+                buttonStyle.padding.top = -4;
+                buttonStyle.padding.left = 3;
+ 
                 Rect rect = new Rect(_currentWindowPosition.width - 20, 4, 16, 16);
-                if (GUI.Button(rect, ""))
+                if (GUI.Button(rect, "x"))
                 {
                     toolbarControl.SetFalse(true);
                     //OnAppLaunchToggle();
@@ -249,7 +219,7 @@ namespace PWBFuelBalancer
                     }
                     if (GUILayout.Button("right"))
                     {
-                        if((HighLogic.LoadedSceneIsEditor && EditorDriver.editorFacility == EditorFacility.SPH) ||
+                        if ((HighLogic.LoadedSceneIsEditor && EditorDriver.editorFacility == EditorFacility.SPH) ||
                             (HighLogic.LoadedSceneIsFlight && selBal.vessel.vesselType == VesselType.Plane))
                             selBal.VecFuelBalancerCoMTarget.x += 0.05f;
                         else
@@ -257,15 +227,40 @@ namespace PWBFuelBalancer
                     }
                     GUILayout.EndHorizontal();
 
-                    {
-                        string toggleText = selBal.MarkerVisible ? "Hide Marker" : "Show Marker";
+                    GUILayout.BeginHorizontal();
+                    GUILayout.FlexibleSpace();
+                    string toggleText = selBal.MarkerVisible ? "Hide Saved CoM" : "Show Saved CoM";
 
-                        if (GUILayout.Button(toggleText))
+                    if (GUILayout.Button(toggleText, GUILayout.Width(120)))
+                    {
+                        selBal.ToggleSavedMarker();
+                    }
+
+                    GUILayout.FlexibleSpace();
+
+                    if (HighLogic.LoadedSceneIsFlight)
+                    {
+                       
+                        toggleText = selBal.MarkerVisible ? "Hide Markers" : "Show Markers";
+
+                        if (GUILayout.Button(toggleText, GUILayout.Width(120)))
                         {
                             selBal.ToggleMarker();
                         }
+
+                        GUILayout.FlexibleSpace();
+
+                       toggleText = selBal.MarkerVisible ? "Hide Actual CoM" : "Show Actual CoM";
+
+                        if (GUILayout.Button(toggleText, GUILayout.Width(120)))
+                        {
+                            selBal.ToggleActualMarker();
+                        }
+                        GUILayout.FlexibleSpace();
+
                     }
 
+                    GUILayout.EndHorizontal();
 
                     // Save slot 1
                     GUILayout.BeginHorizontal();
@@ -361,7 +356,7 @@ namespace PWBFuelBalancer
 
 
             // Remove the stock toolbar button
-            GameEvents.onGUIApplicationLauncherReady.Remove(OnGuiAppLauncherReady);
+            GameEvents.onGUIApplicationLauncherReady.Remove(InitializeToolbar);
             //if (_stockToolbarButton != null)
             //    ApplicationLauncher.Instance.RemoveModApplication(_stockToolbarButton);
             if (toolbarControl != null)

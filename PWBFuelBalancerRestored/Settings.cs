@@ -21,6 +21,8 @@ namespace PWBFuelBalancer
         public override int SectionOrder { get { return 1; } }
         public override bool HasPresets { get { return false; } }
 
+        [GameParameters.CustomParameterUI("Use KSP Skin")]
+        public bool useKSPskin = false;
 
         [GameParameters.CustomParameterUI("Jettisoning fuel continues even when scene changes")]
         public bool continueThroughSceneChanges = true;
@@ -45,6 +47,7 @@ namespace PWBFuelBalancer
         [GameParameters.CustomFloatParameterUI("Blue value", minValue = 0, maxValue = 100f, stepCount = 101,
             toolTip = "Amount of blue to be used in the highlight. range is from 0-100")]
         public float highlightBlue = 1f;
+
 
         public override void SetDifficultyPreset(GameParameters.Preset preset)
         {            
