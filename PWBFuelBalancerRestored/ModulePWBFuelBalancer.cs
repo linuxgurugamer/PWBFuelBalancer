@@ -205,6 +205,7 @@ namespace PWBFuelBalancer
                 SetCoMTarget();
         }
 
+#if false
         /// <summary>
         /// Per-frame update
         /// Called ONLY when Part is ACTIVE!
@@ -212,6 +213,7 @@ namespace PWBFuelBalancer
         public override void OnUpdate()
         {
         }
+#endif
 
         /// <summary>
         /// Per-physx-frame update
@@ -403,6 +405,8 @@ namespace PWBFuelBalancer
             //else
 #endif
             {
+                if (part.transform == null)
+                    return false;
                 // get the location of the centre of mass
                 //print("Com position: " + CoM.transform.position);
                 //Vector3 vecCom = coM.transform.position;

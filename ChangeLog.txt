@@ -1,3 +1,7 @@
+1.5.5.6
+	Minor optimizations by commenting out unused callbacks
+	Fixed harmless nullref in editor when deleting the PWB part
+
 0.1.5.5
 	Added toggles for Saved CoM and Actual CoM
 	Added flag to use KSP skin

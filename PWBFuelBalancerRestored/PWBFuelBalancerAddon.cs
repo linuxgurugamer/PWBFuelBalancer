@@ -313,11 +313,12 @@ namespace PWBFuelBalancer
                 Debug.LogException(ex);
             }
         }
-
+#if false
         public void Update()
         {
             // Debug.Log("PWBFuelBalancerAddon:Update");
         }
+
 
         public void FixedUpdate()
         {
@@ -343,7 +344,7 @@ namespace PWBFuelBalancer
                 Debug.LogException(ex);
             }
         }
-
+#endif
         public void OnDestroy()
         {
             GameEvents.onVesselWasModified.Remove(OnVesselWasModified);
