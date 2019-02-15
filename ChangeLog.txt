@@ -1,3 +1,6 @@
+1.5.5.7
+	Fixed issue with the mod making parts semitransparent in certain circumstances
+
 1.5.5.6
 	Minor optimizations by commenting out unused callbacks
 	Fixed harmless nullref in editor when deleting the PWB part

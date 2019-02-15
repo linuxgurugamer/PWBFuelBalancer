@@ -62,6 +62,8 @@ namespace PWBFuelBalancer
             MarkerCam.name = "markerCam";
             MarkerCam.depth = Camera.main.depth + 10;
             MarkerCam.clearFlags = CameraClearFlags.Depth;
+            MarkerCam.allowHDR = false;
+            //MarkerCam.hdr = false;
             // Add a behaviour so we can get the MarkerCam to come around and change itself when the main camera changes
             _markerCamObject.AddComponent<MarkerCamBehaviour>(); // TODO can this be removed?
 
