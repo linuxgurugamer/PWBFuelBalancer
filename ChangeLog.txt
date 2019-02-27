@@ -1,3 +1,6 @@
+1.5.5.8
+	Fixed nullref when doing a jettison All
+
 1.5.5.7
 	Fixed issue with the mod making parts semitransparent in certain circumstances
 

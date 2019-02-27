@@ -231,8 +231,19 @@ namespace PWBFuelBalancer
         [KSPField(isPersistant = true)]
         internal bool jettisonRes3 = false;
 
-        List<int> pr = new List<int>();
+        //List<int> pr = new List<int>();
+        public class PartRes
+        {
+            public int resnum;
+            public string resname;
 
+            public PartRes(int i, string s)
+            {
+                resnum = i;
+                resname = s;
+            }
+        }
+        List<PartRes> partRes = new List<PartRes>();
 
         void DoJettison(ref bool jettisonRes, int i, bool forceOn = false)
         {
@@ -240,62 +251,66 @@ namespace PWBFuelBalancer
                 jettisonRes = !jettisonRes;
             string eventName = "JettisonRes" + i;
             if (jettisonRes)
-                Events[eventName].guiName = "Stop jettisoning " + part.Resources[pr[i - 1]].info.displayName;
+                Events[eventName].guiName = "Stop jettisoning " + part.Resources[partRes[i - 1].resnum].info.displayName;
             else
             {
-                Events[eventName].guiName = "Jettison " + part.Resources[pr[i - 1]].info.displayName;
+                Events[eventName].guiName = "Jettison " + part.Resources[partRes[i - 1].resnum].info.displayName;
                 pwbVModule.DisablePartHighlighting(this.part);
             }
         }
 #if true
         void DoJettisonAll(int resourceNum, bool forceOn = false)
         {
-            string resourceName = part.Resources[pr[resourceNum]].resourceName;
+            Log.Info("DoJettisonAll, resourceNum: " + resourceNum + ", forceOn: " + forceOn);           
 
-            if (!forceOn && pwbVModule.allPartResources.Contains(part.Resources[pr[resourceNum]].resourceName))
+            string resourceName = part.Resources[partRes[resourceNum].resnum].resourceName;
+            Log.Info("DoJettisonAll, resourceName: " + resourceName + ", partRes[resourceNum].resname: " + partRes[resourceNum].resname);
+            if (!forceOn && pwbVModule.allPartResources.Contains(part.Resources[partRes[resourceNum].resnum].resourceName))
             {
-                foreach (var p in this.vessel.Parts)
+                foreach (var part in this.vessel.Parts)
                 {
-                    var m = p.Modules.GetModule<Jettison>();
-                    if (m != null)
+                    var partModule = part.Modules.GetModule<Jettison>();
+                    if (partModule != null)
                     {
-                        for (int r = m.pr.Count - 1; r >= 0; r--)
+                        for (int r = partModule.partRes.Count - 1; r >= 0; r--)
                         {
-                            if (part.Resources[m.pr[r]].resourceName == resourceName) // && part.Resources[m.pr[r]].flowState)
+                            if (partModule.partRes[r].resname == resourceName)
                             {
                                 string eventName = "JettisonAllRes" + (r + 1);
-                                m.Events[eventName].guiName = "Jettison all " + part.Resources[pr[resourceNum]].info.displayName;
-                                pwbVModule.DisablePartHighlighting(p);
+                                partModule.Events[eventName].guiName = "Jettison all " + base.part.Resources[partRes[resourceNum].resnum].info.displayName;
+                                pwbVModule.DisablePartHighlighting(part);
                                 break;
                             }
                         }
                     }
                 }
-                pwbVModule.RemoveResource(part.Resources[pr[resourceNum]].resourceName);
+                pwbVModule.RemoveResource(part.Resources[partRes[resourceNum].resnum].resourceName);
             }
             else
             {
-                foreach (var p in this.vessel.Parts)
+                foreach (var part in this.vessel.Parts)
                 {
-                    var m = p.Modules.GetModule<Jettison>();
-                    if (m != null)
+                    var partModule = part.Modules.GetModule<Jettison>();
+                    if (partModule != null)
                     {
-                        for (int r = m.pr.Count - 1; r >= 0; r--)
+                        for (int r = partModule.partRes.Count - 1; r >= 0; r--)
                         {
-                            if (part.Resources[m.pr[r]].resourceName == resourceName && part.Resources[m.pr[r]].flowState)
+                            if (partModule.partRes[r].resname == resourceName)
                             {
                                 string eventName = "JettisonAllRes" + (r + 1);
-                                m.Events[eventName].guiName = "Stop jettisoning all " + part.Resources[m.pr[r]].info.displayName;
+                                partModule.Events[eventName].guiName = "Stop jettisoning all " + base.part.Resources[partModule.partRes[r].resnum].info.displayName;
+                                break;
                             }
                         }
                     }
                 }
-                if (!pwbVModule.allPartResources.Contains(part.Resources[pr[resourceNum]].resourceName))
-                    pwbVModule.AddResource(part.Resources[pr[resourceNum]].resourceName);
+               
+                if (!pwbVModule.allPartResources.Contains(part.Resources[partRes[resourceNum].resnum].resourceName))
+                    pwbVModule.AddResource(part.Resources[partRes[resourceNum].resnum].resourceName);
             }
         }
 #else
-        void DoJettisonAll(int resourceNum, bool forceOn = false)
+            void DoJettisonAll(int resourceNum, bool forceOn = false)
         {
             string resourceName = part.Resources[pr[resourceNum]].resourceName;
             foreach (var p in this.vessel.Parts)
@@ -374,22 +389,22 @@ namespace PWBFuelBalancer
         {
             if (!HighLogic.LoadedSceneIsFlight || pwbVModule == null)
                 return;
-            if (jettisonRes1 && !pwbVModule.allPartResources.Contains(part.Resources[pr[0]].resourceName))
-                jettisonRes1 = DoJettison(part.Resources[pr[0]]);
-            if (jettisonRes2 && !pwbVModule.allPartResources.Contains(part.Resources[pr[1]].resourceName))
-                jettisonRes2 = DoJettison(part.Resources[pr[1]]);
-            if (jettisonRes3 && !pwbVModule.allPartResources.Contains(part.Resources[pr[2]].resourceName))
-                jettisonRes3 = DoJettison(part.Resources[pr[2]]);
+            if (jettisonRes1 && !pwbVModule.allPartResources.Contains(part.Resources[partRes[0].resnum].resourceName))
+                jettisonRes1 = DoJettison(part.Resources[partRes[0].resnum]);
+            if (jettisonRes2 && !pwbVModule.allPartResources.Contains(part.Resources[partRes[1].resnum].resourceName))
+                jettisonRes2 = DoJettison(part.Resources[partRes[1].resnum]);
+            if (jettisonRes3 && !pwbVModule.allPartResources.Contains(part.Resources[partRes[2].resnum].resourceName))
+                jettisonRes3 = DoJettison(part.Resources[partRes[2].resnum]);
 
             for (int i = pwbVModule.allPartResources.Count - 1; i >= 0; i--)
             {
-                for (int i1 = pr.Count - 1; i1 >= 0; i1--)
+                for (int i1 = partRes.Count - 1; i1 >= 0; i1--)
                 {
-                    if (pwbVModule.allPartResources[i] == part.Resources[pr[i1]].resourceName)
+                    if (pwbVModule.allPartResources[i] == part.Resources[partRes[i1].resnum].resourceName)
                     {
-                        if (part.Resources[pr[i1]].flowState)
+                        if (part.Resources[partRes[i1].resnum].flowState)
                         {
-                            DoJettison(part.Resources[pr[i1]]);
+                            DoJettison(part.Resources[partRes[i1].resnum]);
                             break;
                         }
                         else
@@ -423,7 +438,7 @@ namespace PWBFuelBalancer
             jettisonRes1 = false;
             jettisonRes2 = false;
             jettisonRes3 = false;
-            pr.Clear();
+            partRes.Clear();
             if (pwbVModule != null)
             {
                 pwbVModule.DisablePartHighlighting(this.part);
@@ -481,7 +496,8 @@ namespace PWBFuelBalancer
                     if (count <= 3)
                     {
 
-                        pr.Add(rcnt);
+                        Log.Info("Part: " + part.partInfo.title + ", Adding to pr: " + rcnt);
+                        partRes.Add( new PartRes( rcnt, resource.resourceName));
                         string eventName = "JettisonRes" + count;
                         string allEventName = "JettisonAllRes" + count;
 
