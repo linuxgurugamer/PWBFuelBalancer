@@ -544,8 +544,11 @@ namespace PWBFuelBalancer
                 Part part1 = ((PartAndResource)_tanks[_iNextSourceTank]).Part;
 
                 // Only process nonempty tanks, and tanks that are not locked.
-                if (resource1.amount > 0 && resource1.flowState)
-                {
+                if (resource1.amount > 0 && resource1.flowState && 
+                    resource1.resourceName != "Ore" &&
+                    resource1.resourceName != "Ablator" &&
+                    resource1.resourceName != "SolidFuel")
+                    {
                     // Only move resources that have mass (don't move electricity!)
                     if (resource1.info.density > 0)
                     {
