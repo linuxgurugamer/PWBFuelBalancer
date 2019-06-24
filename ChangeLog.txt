@@ -1,3 +1,7 @@
+0.1.5.10
+	Version bump for 1.7.2 rebuild
+	Updated AssemblyVersion.tt for path independent usage
+
 0.1.5.9
 	Added check for Ore, Ablator & SolidFuel when doing balancing, now does not consider them when balancing
 
