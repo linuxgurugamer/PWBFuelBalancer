@@ -1,3 +1,9 @@
+0.1.6
+	Added new color picker
+	Fixed harmless nullrefs which occurred when launching
+	Removed log.cs, now using log functions from library
+	Added SpaceTuxLibrary as a dependency
+
 0.1.5.10
 	Version bump for 1.7.2 rebuild
 	Updated AssemblyVersion.tt for path independent usage

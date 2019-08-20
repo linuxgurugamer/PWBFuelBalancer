@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using KSP_Log;
 
 namespace PWBFuelBalancer
 {
@@ -19,6 +20,8 @@ namespace PWBFuelBalancer
         public bool MarkerVisible;
         public bool SavedCoMMarkerVisible;
         public bool ActualCoMMarkerVisible;
+
+        internal static Log Log = new Log("PWBFuelBalancer");
 
         private bool _started; // used to tell if we are set up and good to go. The Update method will check this know if it is a good idea to try to go anything or not.
         private DateTime _lastKeyInputTime;
@@ -453,7 +456,7 @@ namespace PWBFuelBalancer
         private void CreateSavedComMarker()
         {
             if (SavedCoMMarker == null)
-                Log.Info("SavedCoMMarker is null");
+                ModulePWBFuelBalancer.Log.Info("SavedCoMMarker is null");
             
             // Do not try to create the marker if it already exisits
             if (null != SavedCoMMarker) return;
@@ -461,7 +464,7 @@ namespace PWBFuelBalancer
             Camera markerCam = InFlightMarkerCam.GetMarkerCam();
 
             if (markerCam == null)
-                Log.Info("markerCam is null");
+                ModulePWBFuelBalancer.Log.Info("markerCam is null");
             // Did we find the camera? If we did then set up the marker object, and display it via tha camera we found
             if (null == markerCam) return;
             // Try to create a game object using our marker mesh

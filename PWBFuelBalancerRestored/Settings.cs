@@ -1,11 +1,7 @@
-﻿using System;
-using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections;
 using System.Reflection;
-using System.Text;
 using UnityEngine;
+using KSPColorPicker;
 
 namespace PWBFuelBalancer
 {
@@ -27,24 +23,21 @@ namespace PWBFuelBalancer
         [GameParameters.CustomParameterUI("Jettisoning fuel continues even when scene changes")]
         public bool continueThroughSceneChanges = true;
 
-        [GameParameters.CustomParameterUI("Highlight venting parts red")]
-        public bool highlightVentingRed = true;
 
-        [GameParameters.CustomFloatParameterUI("Red value", minValue = 0, maxValue = 100f, stepCount = 101,
+        [GameParameters.CustomParameterUI("Show Color Picker",
+           toolTip = "Show the Color Picker dialog")]
+        public bool showColorPicker = false;
+
+
+        [GameParameters.CustomFloatParameterUI("Red value", minValue = 0, maxValue = 100f, stepCount = 101, displayFormat = "F4",
             toolTip ="Amount of red to be used in the highlight. range is from 0-100")]
         public float highlightRed = 1f;
 
-        [GameParameters.CustomParameterUI("Highlight venting parts green")]
-        public bool highlightVentingGreen = true;
-
-        [GameParameters.CustomFloatParameterUI("Green value", minValue = 0, maxValue = 100f, stepCount = 101,
+        [GameParameters.CustomFloatParameterUI("Green value", minValue = 0, maxValue = 100f, stepCount = 101, displayFormat = "F4",
             toolTip = "Amount of green to be used in the highlight. range is from 0-100")]
         public float highlightGreen = 1f;
 
-        [GameParameters.CustomParameterUI("Highlight venting parts blue")]
-        public bool highlightVentingBlue = true;
-
-        [GameParameters.CustomFloatParameterUI("Blue value", minValue = 0, maxValue = 100f, stepCount = 101,
+        [GameParameters.CustomFloatParameterUI("Blue value", minValue = 0, maxValue = 100f, stepCount = 101, displayFormat = "F4",
             toolTip = "Amount of blue to be used in the highlight. range is from 0-100")]
         public float highlightBlue = 1f;
 
@@ -55,18 +48,39 @@ namespace PWBFuelBalancer
 
         public override bool Enabled(MemberInfo member, GameParameters parameters)
         {
-            if (!highlightVentingBlue) highlightBlue = 0;
-            if (!highlightVentingGreen) highlightGreen = 0;
-            if (!highlightVentingRed) highlightRed = 0;
-            if (member.Name == "highlightRed") return highlightVentingRed;
-            if (member.Name == "highlightGreen") return highlightVentingGreen;
-            if (member.Name == "highlightBlue") return highlightVentingBlue;
+            if (member.Name == "highlightRed" || member.Name == "highlightGreen" || member.Name == "highlightBlue") return false;
 
+            if (showColorPicker)
+            {
+                showColorPicker = false;
+                Color c = new Color(1, 1, 1, 1);
+                c.b = highlightBlue;
+                c.g = highlightGreen;
+                c.r = highlightRed;
+                KSP_ColorPicker.CreateColorPicker(c, false, "ColorCircle");
+            }
             return true;
         }
 
+        bool unread = false;
         public override bool Interactible(MemberInfo member, GameParameters parameters)
         {
+            if (KSP_ColorPicker.showPicker)
+            {
+                unread = true;
+                KSP_ColorPicker.colorPickerInstance.PingTime();
+                return false;
+            }
+            else
+            {
+                if (KSP_ColorPicker.success && unread)
+                {
+                    unread = false;
+                    highlightBlue = KSP_ColorPicker.SelectedColor.b;
+                    highlightGreen = KSP_ColorPicker.SelectedColor.g;
+                    highlightRed = KSP_ColorPicker.SelectedColor.r;
+                }
+            }
             return true;
         }
 

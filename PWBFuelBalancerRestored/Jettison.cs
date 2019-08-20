@@ -2,8 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 using Highlighting;
+using KSP_PartHighlighter;
 
 namespace PWBFuelBalancer
 {
@@ -23,7 +23,7 @@ namespace PWBFuelBalancer
 
         const string VALUENAME = "partResource";
 
-        bool highlight = false;
+        //bool highlight = false;
 
         internal List<string> allPartResources = null;
 
@@ -85,24 +85,31 @@ namespace PWBFuelBalancer
                     InitAllPartResources();
                 }
                 else
-                    Log.Info("PWBVesselModule.Awake, vessel: null");
+                    ModulePWBFuelBalancer.Log.Info("PWBVesselModule.Awake, vessel: null");
             }
             base.Awake();
         }
-
+        internal PartHighlighter phl = null;
+        internal int highlightID;
         protected new void Start()
         {
+            phl = PartHighlighter.CreatePartHighlighter();
+            if (phl == false)
+                return;
+            highlightID = phl.CreateHighlightList();
+            if (highlightID < 0)
+                return;
+
             if (this.vessel != null)
             {
                 InitAllPartResources();
             }
             else
-                Log.Info("PWBVesselModule.Start, vessel: null");
+                ModulePWBFuelBalancer.Log.Info("PWBVesselModule.Start, vessel: null");
 
             UpdateHighlightColors();
             GameEvents.OnGameSettingsApplied.Add(UpdateHighlightColors);
             base.Start();
-            StartCoroutine(CycleHighlighting());
         }
 
         void OnDestroy()
@@ -110,112 +117,26 @@ namespace PWBFuelBalancer
             GameEvents.OnGameSettingsApplied.Remove(UpdateHighlightColors);
         }
 
-        public void HighlightSinglePart(Color highlightC, Color edgeHighlightColor, Part p)
-        {
-            p.SetHighlightDefault();
-            p.SetHighlightType(Part.HighlightType.AlwaysOn);
-            p.SetHighlight(true, false);
-            p.SetHighlightColor(highlightC);
-            p.highlighter.ConstantOn(edgeHighlightColor);
-            p.highlighter.SeeThroughOn();
-
-        }
-        public void AddPartToHighlight(Part p)
-        {
-            if (highlightParts.Contains(p))
-                return;
-            highlightParts.Add(p);
-        }
-
-        public void DisablePartHighlighting(Part part)
-        {
-            if (highlightParts.Contains(part))
-            {
-                part.SetHighlightDefault();
-                part.SetHighlight(false, false);
-                Highlighter highlighter = part.highlighter;
-                part.highlighter.ConstantOff();
-                part.highlighter.SeeThroughOff();
-                highlightParts.Remove(part);
-            }
-        }
-
-        IEnumerator CycleHighlighting()
-        {
-            while (true)
-            {
-                highlight = !highlight;
-                if (highlight)
-                {
-                    HighlightPartsOn();
-                }
-                else
-                {
-                    HighlightPartsOff();
-                }
-                yield return new WaitForSecondsRealtime(1f);
-            }
-        }
-
-                Color highlightC = XKCDColors.Black;
-                Color edgeHighlightColor = XKCDColors.Black;
-        bool highlightActive = false;
         void UpdateHighlightColors()
         {
-            if (HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightVentingBlue ||
-                    HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightVentingRed ||
-                    HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightVentingGreen)
+
             {
-                highlightActive = true;
+                //highlightActive = true;
 
+                Color c = new Color(1,1,1,1);
+                // The following code is because the old way of storing the colors was a number from 0-100, 
+                // The new ColorPicker uses a number 0-1
 
-                if (HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightVentingBlue)
-                {
-                    highlightC.b = HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightBlue / 100f;
-                    edgeHighlightColor.b = highlightC.b;
-                }
-                if (HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightVentingRed)
-                {
-                    highlightC.r = HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightRed / 100f;
-                    edgeHighlightColor.r = highlightC.r;
-                }
-                if (HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightVentingGreen)
-                {
-                    highlightC.g = HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightGreen / 100f;
-                    edgeHighlightColor.g = highlightC.g;
-                }
-            }
-            else
-                highlightActive = false;
-        }
+                c.b = HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightBlue > 1 ? HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightBlue / 100f : HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightBlue;
+                c.r = HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightRed > 1 ? HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightRed / 100f : HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightRed;
+                c.g = HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightGreen > 1 ? HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightGreen / 100f : HighLogic.CurrentGame.Parameters.CustomParams<PWBSettings>().highlightGreen;
+  
+                phl.UpdateHighlightColors(highlightID, c);
 
-        void HighlightPartsOn()
-        {
-            if (highlightActive)
-            { 
-                for (int i = highlightParts.Count - 1; i >= 0; i--)
-                {
-                    Part part = highlightParts[i];
-                    part.SetHighlightColor(highlightC);
-                    part.highlighter.ConstantOn(edgeHighlightColor);
-                    part.highlighter.SeeThroughOn();
-                }
-            }
-        }
-
-        void HighlightPartsOff()
-        {
-            for (int i = highlightParts.Count - 1; i >= 0; i--)
-            {
-                highlightParts[i].SetHighlightDefault();
-                highlightParts[i].SetHighlight(false, false);
-                Highlighter highlighter = highlightParts[i].highlighter;
-                highlightParts[i].highlighter.ConstantOff();
-                highlightParts[i].highlighter.SeeThroughOff();
             }
         }
     }
-
+ 
 
 
     public class Jettison : PartModule
@@ -250,21 +171,29 @@ namespace PWBFuelBalancer
             if (!forceOn)
                 jettisonRes = !jettisonRes;
             string eventName = "JettisonRes" + i;
-            if (jettisonRes)
-                Events[eventName].guiName = "Stop jettisoning " + part.Resources[partRes[i - 1].resnum].info.displayName;
-            else
+            if (Events.Contains(eventName) && i>0 && i <= partRes.Count)
             {
-                Events[eventName].guiName = "Jettison " + part.Resources[partRes[i - 1].resnum].info.displayName;
-                pwbVModule.DisablePartHighlighting(this.part);
+                var resnum = partRes[i - 1].resnum;
+                if (resnum >= 0 && resnum < part.Resources.Count)
+                {
+                    var displayName = part.Resources[resnum].info.displayName;
+
+                    if (jettisonRes)
+                        Events[eventName].guiName = "Stop jettisoning " + displayName;
+                    else
+                    {
+                        Events[eventName].guiName = "Jettison " + displayName;
+                        if (pwbVModule != null && pwbVModule.phl != null)
+                            pwbVModule.phl.DisablePartHighlighting(pwbVModule.highlightID, this.part);
+                    }
+                }
             }
         }
-#if true
+
         void DoJettisonAll(int resourceNum, bool forceOn = false)
         {
-            Log.Info("DoJettisonAll, resourceNum: " + resourceNum + ", forceOn: " + forceOn);           
 
             string resourceName = part.Resources[partRes[resourceNum].resnum].resourceName;
-            Log.Info("DoJettisonAll, resourceName: " + resourceName + ", partRes[resourceNum].resname: " + partRes[resourceNum].resname);
             if (!forceOn && pwbVModule.allPartResources.Contains(part.Resources[partRes[resourceNum].resnum].resourceName))
             {
                 foreach (var part in this.vessel.Parts)
@@ -278,7 +207,7 @@ namespace PWBFuelBalancer
                             {
                                 string eventName = "JettisonAllRes" + (r + 1);
                                 partModule.Events[eventName].guiName = "Jettison all " + base.part.Resources[partRes[resourceNum].resnum].info.displayName;
-                                pwbVModule.DisablePartHighlighting(part);
+                                pwbVModule.phl.DisablePartHighlighting(pwbVModule.highlightID, part);
                                 break;
                             }
                         }
@@ -304,51 +233,12 @@ namespace PWBFuelBalancer
                         }
                     }
                 }
-               
+
                 if (!pwbVModule.allPartResources.Contains(part.Resources[partRes[resourceNum].resnum].resourceName))
                     pwbVModule.AddResource(part.Resources[partRes[resourceNum].resnum].resourceName);
             }
         }
-#else
-            void DoJettisonAll(int resourceNum, bool forceOn = false)
-        {
-            string resourceName = part.Resources[pr[resourceNum]].resourceName;
-            foreach (var p in this.vessel.Parts)
-            {
-                var m = p.Modules.GetModule<Jettison>();
-                if (m != null)
-                {
-                    for (int r = m.pr.Count - 1; r >= 0; r--)
-                    {
-                        if (!forceOn && pwbVModule.allPartResources.Contains(part.Resources[pr[resourceNum]].resourceName))
-                        {
-                            if (part.Resources[m.pr[r]].resourceName == resourceName) // && part.Resources[m.pr[r]].flowState)
-                            {
-                                string eventName = "JettisonAllRes" + (r + 1);
-                                m.Events[eventName].guiName = "Jettison all " + part.Resources[pr[resourceNum]].info.displayName;
-                                pwbVModule.DisablePartHightlighting(p);
-                                break;
-                            }
 
-                            pwbVModule.RemoveResource(part.Resources[pr[resourceNum]].resourceName);
-                        }
-                        else
-                        {
-                            if (part.Resources[m.pr[r]].resourceName == resourceName && part.Resources[m.pr[r]].flowState)
-                            {
-                                string eventName = "JettisonAllRes" + (r + 1);
-                                m.Events[eventName].guiName = "Stop jettisoning all " + part.Resources[m.pr[r]].info.displayName;
-                            }
-
-                            if (!pwbVModule.allPartResources.Contains(part.Resources[pr[resourceNum]].resourceName))
-                                pwbVModule.AddResource(part.Resources[pr[resourceNum]].resourceName);
-                        }
-                    }
-                }
-            }
-        }
-
-#endif
         [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
         public void JettisonRes1()
         {
@@ -409,7 +299,7 @@ namespace PWBFuelBalancer
                         }
                         else
                         {
-                            pwbVModule.DisablePartHighlighting(this.part);
+                            pwbVModule.phl.DisablePartHighlighting(pwbVModule.highlightID, this.part);
                         }
                     }
                 }
@@ -425,10 +315,10 @@ namespace PWBFuelBalancer
             {
                 r.amount = Math.Max(0, r.amount - r.maxAmount / 2000);
 
-                pwbVModule.AddPartToHighlight(this.part);
+                pwbVModule.phl.AddPartToHighlight(pwbVModule.highlightID, this.part);
             }
             else
-                pwbVModule.DisablePartHighlighting(this.part);
+                pwbVModule.phl.DisablePartHighlighting(pwbVModule.highlightID, this.part);
 
             return (r.amount > 0f);
         }
@@ -441,7 +331,7 @@ namespace PWBFuelBalancer
             partRes.Clear();
             if (pwbVModule != null)
             {
-                pwbVModule.DisablePartHighlighting(this.part);
+                pwbVModule.phl.DisablePartHighlighting(pwbVModule.highlightID, this.part);
                 pwbVModule.Clear();
             }
         }
@@ -469,7 +359,7 @@ namespace PWBFuelBalancer
             pwbVModule = this.vessel.GetComponent<PWBVesselModule>();
             if (pwbVModule == null)
             {
-                Log.Error("Start, pwbVModule is null");
+                ModulePWBFuelBalancer.Log.Error("Start, pwbVModule is null");
                 return;
             }
             if (pwbVModule.allPartResources == null)
@@ -486,7 +376,7 @@ namespace PWBFuelBalancer
             {
 
                 var resource = part.Resources[rcnt];
-               
+
                 if (resource.resourceName != "Ore" &&
                     resource.resourceName != "Ablator" &&
                     resource.resourceName != "SolidFuel" &&
@@ -495,15 +385,13 @@ namespace PWBFuelBalancer
                     count++;
                     if (count <= 3)
                     {
-
-                        Log.Info("Part: " + part.partInfo.title + ", Adding to pr: " + rcnt);
-                        partRes.Add( new PartRes( rcnt, resource.resourceName));
+                        ModulePWBFuelBalancer.Log.Info("Part: " + part.partInfo.title + ", Adding to pr: " + rcnt);
+                        partRes.Add(new PartRes(rcnt, resource.resourceName));
                         string eventName = "JettisonRes" + count;
                         string allEventName = "JettisonAllRes" + count;
 
                         Events[eventName].active = true;
                         Events[eventName].guiActive = true;
-                        //Events[eventName].guiName = "Jettison " + resource.info.displayName;
 
                         switch (count)
                         {
