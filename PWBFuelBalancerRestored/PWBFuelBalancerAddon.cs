@@ -369,6 +369,8 @@ namespace PWBFuelBalancer
 
         private void BuildBalancerList()
         {
+            if (_listFuelBalancers == null)
+                return;
             if (HighLogic.LoadedSceneIsFlight)
             {
                 BuildBalancerList(FlightGlobals.ActiveVessel.parts);
@@ -382,7 +384,10 @@ namespace PWBFuelBalancer
                 }
                 else
                 {
-                    BuildBalancerList(EditorLogic.RootPart.vessel.parts);
+                    if (EditorLogic.RootPart != null && EditorLogic.RootPart.vessel != null && EditorLogic.RootPart.crossfeedPartSet != null)
+                    {
+                        BuildBalancerList(EditorLogic.RootPart.vessel.parts);
+                    }
                 }
             }
         }
@@ -390,7 +395,8 @@ namespace PWBFuelBalancer
         // Builds a list of off the ModulePWBFuelBalancers in the whole of the current vessel.
         private void BuildBalancerList(Vessel v)
         {
-            BuildBalancerList(v.parts);
+            if (v != null)
+                BuildBalancerList(v.parts);
         }
 
         private void BuildBalancerList(List<Part> partList)
