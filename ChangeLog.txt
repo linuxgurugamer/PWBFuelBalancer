@@ -1,5 +1,8 @@
 ChangeLog
 
+0.2.0.1
+	Updated DDS images to DXT5
+
 0.2.0
 	Added InstallChecker
 	Updated for KSP 1.8
