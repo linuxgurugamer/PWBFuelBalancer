@@ -405,7 +405,7 @@ namespace PWBFuelBalancer
 
                         GUILayout.Space(10);
                     }
-                    if (HighLogic.LoadedSceneIsFlight) // && selBal.isPWBFuelBalancerPart)
+                    //if (HighLogic.LoadedSceneIsFlight) // && selBal.isPWBFuelBalancerPart)
                     {
                         GUILayout.BeginHorizontal();
 

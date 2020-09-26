@@ -1,5 +1,8 @@
 ChangeLog
 
+0.2.1.1
+	Fixed missing button "Set CoM" in the editor
+
 0.2.1
 	Fixed name of toolbar button
 	Added patch to add ModulePWBFuelBalance to all parts with a ModuleCommand
