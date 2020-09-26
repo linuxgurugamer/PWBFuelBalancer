@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Highlighting;
 using KSP_PartHighlighter;
+using KSP_Log;
 
 namespace PWBFuelBalancer
 {
@@ -20,6 +21,7 @@ namespace PWBFuelBalancer
         string resource3 = "";
 
 
+        internal static Log Log = new Log("PWBFuelBalancer.PWBVesselModule");
 
         const string VALUENAME = "partResource";
 
@@ -28,6 +30,8 @@ namespace PWBFuelBalancer
         internal List<string> allPartResources = null;
 
         internal List<Part> highlightParts = null;
+        internal PartHighlighter phl = null;
+        internal int highlightID;
 
         internal void AddResource(string r)
         {
@@ -85,12 +89,11 @@ namespace PWBFuelBalancer
                     InitAllPartResources();
                 }
                 else
-                    ModulePWBFuelBalancer.Log.Info("PWBVesselModule.Awake, vessel: null");
+                    Log.Info("PWBVesselModule.Awake, vessel: null");
             }
             base.Awake();
         }
-        internal PartHighlighter phl = null;
-        internal int highlightID;
+
         protected new void Start()
         {
             phl = PartHighlighter.CreatePartHighlighter();
@@ -105,7 +108,7 @@ namespace PWBFuelBalancer
                 InitAllPartResources();
             }
             else
-                ModulePWBFuelBalancer.Log.Info("PWBVesselModule.Start, vessel: null");
+                Log.Info("PWBVesselModule.Start, vessel: null");
 
             UpdateHighlightColors();
             GameEvents.OnGameSettingsApplied.Add(UpdateHighlightColors);
@@ -136,8 +139,6 @@ namespace PWBFuelBalancer
             }
         }
     }
- 
-
 
     public class Jettison : PartModule
     {
@@ -152,7 +153,8 @@ namespace PWBFuelBalancer
         [KSPField(isPersistant = true)]
         internal bool jettisonRes3 = false;
 
-        //List<int> pr = new List<int>();
+        internal static Log Log = new Log("PWBFuelBalancer.Jettison");
+
         public class PartRes
         {
             public int resnum;
@@ -165,6 +167,44 @@ namespace PWBFuelBalancer
             }
         }
         List<PartRes> partRes = new List<PartRes>();
+        #region KSPEvents
+        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
+        public void JettisonRes1()
+        {
+            DoJettison(ref jettisonRes1, 1);
+        }
+
+        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison All Resource")]
+        public void JettisonAllRes1()
+        {
+            DoJettisonAll(0);
+        }
+
+        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
+        public void JettisonRes2()
+        {
+            DoJettison(ref jettisonRes2, 2);
+        }
+
+        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison All Resource")]
+        public void JettisonAllRes2()
+        {
+            DoJettisonAll(1);
+        }
+
+        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
+        public void JettisonRes3()
+        {
+            DoJettison(ref jettisonRes3, 3);
+        }
+
+        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison All Resource")]
+        public void JettisonAllRes3()
+        {
+            DoJettisonAll(2);
+        }
+        #endregion
+
 
         void DoJettison(ref bool jettisonRes, int i, bool forceOn = false)
         {
@@ -239,42 +279,6 @@ namespace PWBFuelBalancer
             }
         }
 
-        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
-        public void JettisonRes1()
-        {
-            DoJettison(ref jettisonRes1, 1);
-        }
-
-        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison All Resource")]
-        public void JettisonAllRes1()
-        {
-            DoJettisonAll(0);
-        }
-
-        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
-        public void JettisonRes2()
-        {
-            DoJettison(ref jettisonRes2, 2);
-        }
-
-        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison All Resource")]
-        public void JettisonAllRes2()
-        {
-            DoJettisonAll(1);
-        }
-
-        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
-        public void JettisonRes3()
-        {
-            DoJettison(ref jettisonRes3, 3);
-        }
-
-        [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison All Resource")]
-        public void JettisonAllRes3()
-        {
-            DoJettisonAll(2);
-        }
-
         public void LateUpdate()
         {
             if (!HighLogic.LoadedSceneIsFlight || pwbVModule == null)
@@ -305,9 +309,6 @@ namespace PWBFuelBalancer
                 }
             }
         }
-
-
-
 
         bool DoJettison(PartResource r)
         {
@@ -359,7 +360,7 @@ namespace PWBFuelBalancer
             pwbVModule = this.vessel.GetComponent<PWBVesselModule>();
             if (pwbVModule == null)
             {
-                ModulePWBFuelBalancer.Log.Error("Start, pwbVModule is null");
+                Log.Error("Start, pwbVModule is null");
                 return;
             }
             if (pwbVModule.allPartResources == null)
@@ -385,7 +386,7 @@ namespace PWBFuelBalancer
                     count++;
                     if (count <= 3)
                     {
-                        ModulePWBFuelBalancer.Log.Info("Part: " + part.partInfo.title + ", Adding to pr: " + rcnt);
+                        Log.Info("Part: " + part.partInfo.title + ", Adding to pr: " + rcnt);
                         partRes.Add(new PartRes(rcnt, resource.resourceName));
                         string eventName = "JettisonRes" + count;
                         string allEventName = "JettisonAllRes" + count;

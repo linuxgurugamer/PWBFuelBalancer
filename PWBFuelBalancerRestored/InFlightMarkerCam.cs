@@ -12,13 +12,13 @@ namespace PWBFuelBalancer
 
         private void Awake()
         {
-            //print("InFlightMarkerCam::Awake");
+            //Log.Info("InFlightMarkerCam::Awake");
             _markerCamObject = null;
         }
 
         public void Start()
         {
-            //print("InFlightMarkerCam::Start");
+            //Log.Info("InFlightMarkerCam::Start");
             CreateMarkerCam();
             GameEvents.onVesselChange.Add(OnVesselChange);
         }
@@ -34,9 +34,9 @@ namespace PWBFuelBalancer
         }
         private void DestroyMarkerCam()
         {
-            // print("InFlightMarkerCam::DestroyMarkerCam");
+            // Log.Info("InFlightMarkerCam::DestroyMarkerCam");
             if (null == _markerCamObject) return;
-            // print("Shutting down the inflight MarkerCamObject");
+            // Log.Info("Shutting down the inflight MarkerCamObject");
             // There should be only one, but lets do all of them just in case.
             IEnumerator mcbs = _markerCamObject.GetComponents<MarkerCamBehaviour>().GetEnumerator();
             while (mcbs.MoveNext())
@@ -53,7 +53,8 @@ namespace PWBFuelBalancer
         private void CreateMarkerCam()
         {
             if (null != _markerCamObject) return;
-            // print("Setting up the inflight MarkerCamObject");
+
+            // Log.Info("Setting up the inflight MarkerCamObject");
             _markerCamObject = new GameObject("MarkerCamObject");
             _markerCamObject.transform.parent = FlightCamera.fetch.cameras[0].gameObject.transform;//Camera.mainCamera.gameObject.transform; // Set the new camera to be a child of the main camera  
             MarkerCam = _markerCamObject.AddComponent<Camera>();
@@ -83,11 +84,12 @@ namespace PWBFuelBalancer
                 }
             }
             return null;
+
+            return MarkerCam;
         }
 
         private void OnVesselChange(Vessel data)
         {
-            //Debug.Log("Setting MarkerCam.enabled from OnVesselChange");
             MarkerCamEnabled = !data.isEVA && IsMarkerCamEnabled(data.parts);
         }
 

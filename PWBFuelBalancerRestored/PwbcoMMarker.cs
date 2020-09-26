@@ -2,23 +2,17 @@
 
 namespace PWBFuelBalancer
 {
-    public class PwbcoMMarker : MonoBehaviour
+    public class PwbCoMMarker : MonoBehaviour
     {
         private ModulePWBFuelBalancer _linkedPart;
 
-        public void LinkPart(ModulePWBFuelBalancer newPart)
-        {
-            //print("Linking part");
-            _linkedPart = newPart;
-        }
+        internal ModulePWBFuelBalancer LinkPart {  set { _linkedPart = value; } }
 
         private void LateUpdate()
         {
             if (null == _linkedPart) return;
             transform.position = _linkedPart.vessel.CoM;
             transform.rotation = _linkedPart.vessel.transform.rotation;
-
-            // print("Actual CoM marker position has been set to: " + transform.position);
         }
     }
 

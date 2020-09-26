@@ -47,51 +47,50 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssemblyVersion.tt</DependentUpon>
     </Compile>
+    <Compile Include="DrawTools.cs" />
     <Compile Include="GuiUtils.cs" />
     <Compile Include="InFlightMarkerCam.cs" />
     <Compile Include="InstallChecker.cs" />
     <Compile Include="Jettison.cs" />
-    <Compile Include="Log.cs" />
     <Compile Include="MarkerCamBehaviour.cs" />
     <Compile Include="ModulePWBFuelBalancer.cs" />
-    <Compile Include="Osd.cs" />
     <Compile Include="PartAndResource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PwbcoMMarker.cs" />
+    <Compile Include="PwbCoLMarker.cs" />
+    <Compile Include="PwbCoMMarker.cs" />
     <Compile Include="PWBFuelBalancerAddon.cs" />
-    <Compile Include="PwbkspFuelBalancer.cs" />
     <Compile Include="SavedCoMMarker.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="ToolbarRegistration.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\Assembly*.dll">
+    <Reference Include="$(KSPDIR_191)\KSP_x64_Data\Managed\Assembly*.dll">
       <Private>False</Private>
     </Reference>
-    <Reference Include="$(KSPDIR)\KSP_x64_Data\Managed\UnityEngine*.dll">
+    <Reference Include="$(KSPDIR_191)\KSP_x64_Data\Managed\UnityEngine*.dll">
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="ClickThroughBlocker, Version=0.1.7.3, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(KSPDIR)\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
+      <HintPath>$(KSPDIR_191)\GameData\000_ClickThroughBlocker\Plugins\ClickThroughBlocker.dll</HintPath>
     </Reference>
     <Reference Include="KSP_ColorPicker, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(KSPDIR)\GameData\SpaceTuxLibrary\Plugins\KSP_ColorPicker.dll</HintPath>
+      <HintPath>$(KSPDIR_191)\GameData\SpaceTuxLibrary\Plugins\KSP_ColorPicker.dll</HintPath>
     </Reference>
     <Reference Include="KSP_Log, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(KSPDIR)\GameData\SpaceTuxLibrary\Plugins\KSP_Log.dll</HintPath>
+      <HintPath>$(KSPDIR_191)\GameData\SpaceTuxLibrary\Plugins\KSP_Log.dll</HintPath>
     </Reference>
     <Reference Include="KSP_PartHighlighter, Version=0.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(KSPDIR)\GameData\SpaceTuxLibrary\Plugins\KSP_PartHighlighter.dll</HintPath>
+      <HintPath>$(KSPDIR_191)\GameData\SpaceTuxLibrary\Plugins\KSP_PartHighlighter.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="ToolbarControl, Version=0.1.8.2, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(KSPDIR)\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
+      <HintPath>$(KSPDIR_191)\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

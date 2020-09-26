@@ -1,5 +1,20 @@
 ChangeLog
 
+0.2.0.2 
+	Fixed name of toolbar button
+	Added patch to add ModulePWBFuelBalance to all parts with a ModuleCommand
+	Fixed memory leak where a GUIStyle was constantly being created while the window was open
+	Lots of cleanup
+	Improved dialog window in flight
+	Added unlimited number of saved positions
+	Changed rate of fuel transfer to be 1/20 of the size of the destination time/sec (previously was doing a max of 50/sec, irregradless of the tank sizes)
+	Made sure that only one can be active at a time
+	Fixed bug where multiple PWB modules couldn't show any tokens in flight
+	Consolidated Start and OnStart in module, same with Awake and OnAwake, and Destroy & OnDestroy
+	Initial balancer name is the name of the part
+	Added yellow highlight of active balancer & selected CoL
+	Added compact, expanded & select mode for flight
+
 0.2.0.1
 	Updated DDS images to DXT5
 
@@ -42,6 +57,8 @@ ChangeLog
 	Added Settings page to specify whether jettison should continue when switching scenes
 	Added edge pulsing to show which parts are venting
 	Added color settings sliders to settings page
+	Added PartInfo method
+	Added seperate toggle for the CoL marker
 
 0.1.5.3
 	Fixed a problem with the jettison code, which was failing on vessels with many parts & tanks

@@ -9,7 +9,7 @@ namespace PWBFuelBalancer
         {
             gameObject.transform.position = FlightCamera.fetch.cameras[0].gameObject.transform.position;
             gameObject.transform.rotation = FlightCamera.fetch.cameras[0].gameObject.transform.rotation;
-            // print("Setting markercam to be at: " + this.gameObject.transform.position + " and rotation " + Camera.main.transform.position);
+            // Log.Info("Setting markercam to be at: " + this.gameObject.transform.position + " and rotation " + Camera.main.transform.position);
         }
     }
 }

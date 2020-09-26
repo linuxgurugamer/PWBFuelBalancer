@@ -6,11 +6,7 @@ namespace PWBFuelBalancer
     {
         private ModulePWBFuelBalancer _linkedPart;
 
-        public void LinkPart(ModulePWBFuelBalancer newPart)
-        {
-            //print("Linking part");
-            _linkedPart = newPart;
-        }
+        internal ModulePWBFuelBalancer LinkPart {  set { _linkedPart = value; } }
 
         private void LateUpdate()
         {
@@ -21,8 +17,6 @@ namespace PWBFuelBalancer
             {
                 transform.rotation = _linkedPart.vessel.transform.rotation;
             }
-            // print("CoM marker position has been set to: " + transform.position);
         }
     }
-
 }
