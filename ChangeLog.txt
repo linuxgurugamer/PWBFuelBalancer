@@ -1,6 +1,6 @@
 ChangeLog
 
-0.2.0.2 
+0.2.1
 	Fixed name of toolbar button
 	Added patch to add ModulePWBFuelBalance to all parts with a ModuleCommand
 	Fixed memory leak where a GUIStyle was constantly being created while the window was open
