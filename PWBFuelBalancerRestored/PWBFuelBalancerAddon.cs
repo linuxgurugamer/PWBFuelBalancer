@@ -505,6 +505,8 @@ namespace PWBFuelBalancer
                             selBal.savedMarkers.Add(new SavedMarker("", new Vector3(0, 0, 0)));
                             selBal.SetCoM();
                         }
+
+#if false
                         GUI.enabled = selBal.VecFuelBalancerCoMTarget != ModulePWBFuelBalancer.NegVector; ;
                         toggleText = selBal.MarkerVisible ? "Hide Markers" : "Show Markers";
 
@@ -514,6 +516,9 @@ namespace PWBFuelBalancer
                         }
 
                         GUI.enabled = true;
+#else
+                        GUILayout.Label(" ", GUILayout.Width(120));
+#endif
 
                         toggleText = selBal.ActualCoLMarkerVisible ? "Hide CoL" : "Show CoL";
                         if (GUILayout.Button(toggleText, GUILayout.Width(120)))

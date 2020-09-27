@@ -1,5 +1,8 @@
 ChangeLog
 
+0.2.1.2
+	Removed extra "Show Markers" button
+	
 0.2.1.1
 	Fixed missing button "Set CoM" in the editor
 
