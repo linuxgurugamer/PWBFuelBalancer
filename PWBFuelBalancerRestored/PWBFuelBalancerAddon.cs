@@ -154,6 +154,12 @@ namespace PWBFuelBalancer
 
         public void Awake()
         {
+#if DEBUG
+            Log.SetLevel(Log.LEVEL.INFO);
+#else
+                Log.SetLevel(Log.LEVEL.ERROR);
+#endif
+
             fetch = this;
             // create the list of balancers
             _listFuelBalancers = new List<ModulePWBFuelBalancer>();

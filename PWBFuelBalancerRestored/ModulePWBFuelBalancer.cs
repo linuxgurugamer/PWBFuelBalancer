@@ -221,6 +221,12 @@ namespace PWBFuelBalancer
         /// </summary>
         public new void Awake()
         {
+#if DEBUG
+            Log.SetLevel(Log.LEVEL.INFO);
+#else
+                Log.SetLevel(Log.LEVEL.ERROR);
+#endif
+
             Log.Info("Awake");
             _tanks = null;
             MarkerVisible = false;

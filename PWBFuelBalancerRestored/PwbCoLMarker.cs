@@ -68,6 +68,12 @@ namespace PWBFuelBalancer
 
         void Start()
         {
+#if DEBUG
+            Log.SetLevel(Log.LEVEL.INFO);
+#else
+                Log.SetLevel(Log.LEVEL.ERROR);
+#endif
+
             UpdateSettings();
             GameEvents.OnGameSettingsApplied.Add(OnGameSettingsApplied);
         }

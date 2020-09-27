@@ -84,6 +84,11 @@ namespace PWBFuelBalancer
         {
             //if (HighLogic.LoadedSceneIsGame)
             {
+#if DEBUG
+                Log.SetLevel(Log.LEVEL.INFO);
+#else
+                Log.SetLevel(Log.LEVEL.ERROR);
+#endif
                 if (this.vessel != null)
                 {
                     InitAllPartResources();
@@ -167,7 +172,7 @@ namespace PWBFuelBalancer
             }
         }
         List<PartRes> partRes = new List<PartRes>();
-        #region KSPEvents
+#region KSPEvents
         [KSPEvent(guiActive = false, guiActiveEditor = false, guiName = "Jettison Resource")]
         public void JettisonRes1()
         {
@@ -203,7 +208,7 @@ namespace PWBFuelBalancer
         {
             DoJettisonAll(2);
         }
-        #endregion
+#endregion
 
 
         void DoJettison(ref bool jettisonRes, int i, bool forceOn = false)
@@ -355,6 +360,13 @@ namespace PWBFuelBalancer
         {
             if (!HighLogic.LoadedSceneIsFlight)
                 return;
+
+#if DEBUG
+            Log.SetLevel(Log.LEVEL.INFO);
+#else
+                Log.SetLevel(Log.LEVEL.ERROR);
+#endif
+
 
             GameEvents.onGameSceneLoadRequested.Add(OnGameSceneLoadRequested);
             pwbVModule = this.vessel.GetComponent<PWBVesselModule>();
