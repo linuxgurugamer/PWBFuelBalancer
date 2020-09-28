@@ -270,7 +270,7 @@ namespace PWBFuelBalancer
             if (HighLogic.LoadedSceneIsEditor)
             {
                 GameEvents.onEditorPartPlaced.Add(OnEditorPartPlaced);
-                GameEvents.onEditorPartDeleted.Add(OnEditorPartPlaced);
+                GameEvents.onEditorPartDeleted.Add(OnEditorPartDeleted);
             }
             if (HighLogic.LoadedSceneIsFlight)
             {
@@ -292,7 +292,7 @@ namespace PWBFuelBalancer
             if (HighLogic.LoadedSceneIsEditor)
             {
                 GameEvents.onEditorPartPlaced.Remove(OnEditorPartPlaced);
-                GameEvents.onEditorPartDeleted.Remove(OnEditorPartPlaced);
+                GameEvents.onEditorPartDeleted.Remove(OnEditorPartDeleted);
             }
             if (HighLogic.LoadedSceneIsFlight)
             {
@@ -324,6 +324,13 @@ namespace PWBFuelBalancer
         void OnEditorPartPlaced(Part p)
         {
             if (p == this.part)
+                // Set the CoM to the current CoM
+                SetCoMTarget();
+            FindAllPWBModules();
+        }
+        void OnEditorPartDeleted(Part p)
+        {
+            if (p != this.part)
                 // Set the CoM to the current CoM
                 SetCoMTarget();
             FindAllPWBModules();

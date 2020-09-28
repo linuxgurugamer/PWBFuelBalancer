@@ -1,5 +1,8 @@
 ChangeLog
 
+0.2.1.4 
+	Fixed exception in editor when deleting a part
+
 0.2.1.3
 	Removed log spam
 
