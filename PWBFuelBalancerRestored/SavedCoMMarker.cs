@@ -10,7 +10,7 @@ namespace PWBFuelBalancer
 
         private void LateUpdate()
         {
-            if (null == _linkedPart) return;
+            if (null == _linkedPart || _linkedPart.transform == null || _linkedPart.part == null) return;
             Vector3 vecTargetComRotated = (_linkedPart.transform.rotation * Quaternion.Inverse(_linkedPart.RotationInEditor)) * _linkedPart.VecFuelBalancerCoMTarget;
             transform.position = _linkedPart.part.transform.position + vecTargetComRotated;
             if (HighLogic.LoadedSceneIsFlight)

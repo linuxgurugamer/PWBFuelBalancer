@@ -510,7 +510,7 @@ namespace PWBFuelBalancer
 
         private bool SetCoMTarget()
         {
-            if (part.transform == null)
+            if (part == null || part.transform == null)
                 return false;
 
             // if (HighLogic.LoadedSceneIsEditor)
