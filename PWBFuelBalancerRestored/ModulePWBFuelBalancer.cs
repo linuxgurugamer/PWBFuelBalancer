@@ -33,7 +33,7 @@ namespace PWBFuelBalancer
 
         internal List<ModulePWBFuelBalancer> pwbModules = new List<ModulePWBFuelBalancer>();
 
-        static Log Log = new Log("PWBFuelBalancer.ModulePWBFuelBalancer");
+        static Log Log = new Log("PWBFuelBalancer.ModulePWBFuelBalancer", Log.LEVEL.ERROR);
 
         private bool _started; // used to tell if we are set up and good to go. The Update method will check this know if it is a good idea to try to go anything or not.
         private DateTime _lastKeyInputTime;
@@ -347,7 +347,6 @@ namespace PWBFuelBalancer
         private void FixedUpdate()
         {
             Log.Info("FixedUpdate, ActualCoMMarker: " + (ActualCoMMarker != null) + ", ActualCoMMarkerVisible: " + ActualCoMMarkerVisible);
-            Log.Info("FixedUpdate, ActualCoLMarker: " + (ActualCoLMarker != null) + ", ActualCoLMarkerVisible: " + ActualCoLMarkerVisible);
 
             if (ActualCoMMarker != null) ActualCoMMarker.SetActive(!MapView.MapIsEnabled && ActualCoMMarkerVisible && !HideUI);
             if (ActualCoLMarker != null) ActualCoLMarker.SetActive(!MapView.MapIsEnabled && ActualCoLMarkerVisible && vessel.srf_velocity.magnitude > 0.1f && !HideUI);
